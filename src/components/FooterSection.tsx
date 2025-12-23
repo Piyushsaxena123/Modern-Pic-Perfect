@@ -38,7 +38,7 @@ const FooterSection = () => {
           <div>
             <h4 className="font-display font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              {["Home", "Tools", "About", "Pricing", "Blog"].map((link) => (
+              {["Home", "Tools", "About", "Contact"].map((link) => (
                 <li key={link}>
                   <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                     {link}
