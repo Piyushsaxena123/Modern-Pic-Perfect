@@ -11,10 +11,10 @@ interface AIUpscaleEditorProps {
 type UpscaleMode = "2x" | "4x" | "hd" | "4k";
 
 const upscaleModes = [
-  { id: "2x" as const, label: "2x", description: "Double resolution" },
-  { id: "4x" as const, label: "4x", description: "Quadruple resolution" },
-  { id: "hd" as const, label: "HD", description: "1920×1080" },
-  { id: "4k" as const, label: "4K", description: "3840×2160" },
+  { id: "2x" as const, label: "2x", description: "Enhance quality" },
+  { id: "4x" as const, label: "4x", description: "Max quality" },
+  { id: "hd" as const, label: "HD", description: "HD quality" },
+  { id: "4k" as const, label: "4K", description: "4K quality" },
 ];
 
 const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
