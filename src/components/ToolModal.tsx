@@ -57,8 +57,16 @@ const ToolModal = ({ tool, onClose }: ToolModalProps) => {
   const [selectedRatio, setSelectedRatio] = useState<string>("Free");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const config = toolConfig[tool];
+  const config = toolConfig[tool] || { 
+    title: "Tool", 
+    icon: MessageSquare, 
+    color: "from-primary to-accent" 
+  };
 
+  // If tool doesn't have a config and isn't feedback, close the modal
+  if (!toolConfig[tool] && tool !== "feedback") {
+    return null;
+  }
   // Load image element when URL changes
   useEffect(() => {
     if (uploadedImage) {
