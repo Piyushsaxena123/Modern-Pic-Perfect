@@ -16,6 +16,10 @@ import {
   Camera,
   Layers,
   FileText,
+  Clock,
+  ZoomIn,
+  Eraser,
+  Palette,
 } from "lucide-react";
 
 interface ToolsSectionProps {
@@ -126,6 +130,38 @@ const tools = [
     description: "Convert 100+ images to PDF, PPT, or Word document in one click.",
     color: "from-blue-500 to-indigo-600",
     badge: "NEW",
+  },
+  {
+    id: "gallery",
+    icon: Clock,
+    title: "Image Gallery",
+    description: "View and manage your editing history with before/after comparison.",
+    color: "from-violet-500 to-purple-600",
+    badge: null,
+  },
+  {
+    id: "upscale",
+    icon: ZoomIn,
+    title: "AI Upscaler",
+    description: "Enhance low-resolution images to high quality with AI upscaling.",
+    color: "from-emerald-500 to-teal-600",
+    badge: "AI",
+  },
+  {
+    id: "objectremove",
+    icon: Eraser,
+    title: "AI Object Removal",
+    description: "Paint over unwanted objects and let AI remove them seamlessly.",
+    color: "from-red-500 to-orange-600",
+    badge: "AI",
+  },
+  {
+    id: "styletransfer",
+    icon: Palette,
+    title: "AI Style Transfer",
+    description: "Transform photos into anime, watercolor, oil painting and more.",
+    color: "from-purple-500 to-pink-600",
+    badge: "AI",
   },
 ];
 
