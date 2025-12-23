@@ -7,14 +7,36 @@ import { supabase } from "@/integrations/supabase/client";
 type BackgroundType = "transparent" | "color" | "custom";
 
 const colorOptions = [
+  // Basic Colors
   { id: "white", color: "#FFFFFF", name: "White" },
-  { id: "lightblue", color: "#E3F2FD", name: "Light Blue" },
+  { id: "black", color: "#000000", name: "Black" },
   { id: "lightgray", color: "#F5F5F5", name: "Light Gray" },
+  { id: "darkgray", color: "#424242", name: "Dark Gray" },
+  
+  // Blues
+  { id: "lightblue", color: "#E3F2FD", name: "Light Blue" },
+  { id: "skyblue", color: "#87CEEB", name: "Sky Blue" },
   { id: "blue", color: "#1976D2", name: "Blue" },
-  { id: "red", color: "#D32F2F", name: "Red" },
-  { id: "green", color: "#388E3C", name: "Green" },
   { id: "navy", color: "#1A237E", name: "Navy" },
+  { id: "teal", color: "#00695C", name: "Teal" },
+  
+  // Warm Colors
+  { id: "red", color: "#D32F2F", name: "Red" },
   { id: "maroon", color: "#7B1FA2", name: "Maroon" },
+  { id: "orange", color: "#F57C00", name: "Orange" },
+  { id: "yellow", color: "#FBC02D", name: "Yellow" },
+  { id: "cream", color: "#FFFDD0", name: "Cream" },
+  
+  // Greens
+  { id: "green", color: "#388E3C", name: "Green" },
+  { id: "lightgreen", color: "#C8E6C9", name: "Light Green" },
+  { id: "olive", color: "#808000", name: "Olive" },
+  
+  // Other
+  { id: "pink", color: "#E91E63", name: "Pink" },
+  { id: "purple", color: "#7B1FA2", name: "Purple" },
+  { id: "brown", color: "#795548", name: "Brown" },
+  { id: "beige", color: "#F5F5DC", name: "Beige" },
 ];
 
 const BackgroundRemover = () => {
@@ -23,6 +45,8 @@ const BackgroundRemover = () => {
   const [processing, setProcessing] = useState(false);
   const [backgroundType, setBackgroundType] = useState<BackgroundType>("transparent");
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const [customColor, setCustomColor] = useState("#FFFFFF");
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [customBackground, setCustomBackground] = useState<string | null>(null);
   const customBgInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -231,18 +255,64 @@ const BackgroundRemover = () => {
 
                   {/* Color Picker */}
                   {backgroundType === "color" && (
-                    <div className="grid grid-cols-4 gap-2 p-3 glass rounded-xl">
-                      {colorOptions.map((c) => (
+                    <div className="p-3 glass rounded-xl space-y-3">
+                      <div className="grid grid-cols-7 gap-2">
+                        {colorOptions.map((c) => (
+                          <button
+                            key={c.id}
+                            onClick={() => {
+                              setSelectedColor(c.color);
+                              setShowColorPicker(false);
+                            }}
+                            className={`aspect-square rounded-lg transition-all ${
+                              selectedColor === c.color ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110" : "hover:scale-105"
+                            }`}
+                            style={{ backgroundColor: c.color, border: "1px solid rgba(0,0,0,0.15)" }}
+                            title={c.name}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Custom Color Picker */}
+                      <div className="pt-2 border-t border-border">
                         <button
-                          key={c.id}
-                          onClick={() => setSelectedColor(c.color)}
-                          className={`aspect-square rounded-lg transition-all ${
-                            selectedColor === c.color ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110" : "hover:scale-105"
-                          }`}
-                          style={{ backgroundColor: c.color, border: "1px solid rgba(0,0,0,0.1)" }}
-                          title={c.name}
-                        />
-                      ))}
+                          onClick={() => setShowColorPicker(!showColorPicker)}
+                          className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                        >
+                          <span className="text-sm font-medium">Custom Color</span>
+                          <div 
+                            className="w-6 h-6 rounded-lg border-2 border-border"
+                            style={{ backgroundColor: customColor }}
+                          />
+                        </button>
+                        
+                        {showColorPicker && (
+                          <div className="mt-2 space-y-2">
+                            <input
+                              type="color"
+                              value={customColor}
+                              onChange={(e) => {
+                                setCustomColor(e.target.value);
+                                setSelectedColor(e.target.value);
+                              }}
+                              className="w-full h-10 rounded-lg cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={customColor}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                                  setCustomColor(val);
+                                  if (val.length === 7) setSelectedColor(val);
+                                }
+                              }}
+                              placeholder="#FFFFFF"
+                              className="w-full p-2 rounded-lg bg-secondary text-sm text-center font-mono"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

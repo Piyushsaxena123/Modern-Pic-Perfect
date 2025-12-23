@@ -132,6 +132,55 @@ serve(async (req) => {
       } else {
         prompt += `Add appropriate traditional formal attire for their culture.`;
       }
+    } else if (clothingType === "traditional-kurta") {
+      prompt += `Change their outfit to a KURTA PAJAMA. `;
+      if (gender === "male") {
+        prompt += `Add an elegant kurta (long tunic) in a rich color like cream, beige, or pastel, paired with churidar or pajama pants. The kurta should have subtle embroidery or be plain silk. This is traditional Indian formal wear.`;
+      } else {
+        prompt += `Add an elegant kurti or kurta in a rich color with churidar. The outfit should look traditional and elegant.`;
+      }
+    } else if (clothingType === "traditional-sherwani") {
+      prompt += `Change their outfit to a SHERWANI. `;
+      if (gender === "male") {
+        prompt += `Add a royal sherwani - a long coat-like garment in a rich color (gold, maroon, navy, or cream) with intricate embroidery, paired with churidar pants. This is premium Indian formal wear for weddings and special occasions.`;
+      } else {
+        prompt += `Add an elegant formal traditional outfit with rich embroidery, suitable for formal occasions.`;
+      }
+    } else if (clothingType === "traditional-nehru") {
+      prompt += `Change their outfit to a NEHRU JACKET / BANDHGALA. `;
+      if (gender === "male") {
+        prompt += `Add a Nehru jacket (bandhgala) - a closed-collar formal jacket in a solid color like black, navy, or beige, worn over a formal kurta or shirt. This is a sophisticated Indian formal wear.`;
+      } else {
+        prompt += `Add a formal Nehru-style jacket over a traditional blouse or kurta, creating an elegant Indo-western look.`;
+      }
+    } else if (clothingType === "traditional-saree") {
+      prompt += `Change their outfit to a SAREE. `;
+      if (gender === "female") {
+        prompt += `Add an elegant silk saree in a rich color (like red, gold, green, or blue) with a matching blouse. The saree should be draped beautifully and look suitable for formal occasions. Include traditional jewelry if appropriate.`;
+      } else {
+        prompt += `Add traditional formal wear suitable for the person.`;
+      }
+    } else if (clothingType === "traditional-salwar") {
+      prompt += `Change their outfit to SALWAR KAMEEZ. `;
+      if (gender === "female") {
+        prompt += `Add an elegant salwar kameez (tunic with loose pants) in a beautiful color with embroidery or prints. Include a dupatta (scarf). This is comfortable yet elegant traditional Indian wear.`;
+      } else {
+        prompt += `Add a traditional kurta with pajama pants, suitable for formal occasions.`;
+      }
+    } else if (clothingType === "traditional-lehenga") {
+      prompt += `Change their outfit to a LEHENGA CHOLI. `;
+      if (gender === "female") {
+        prompt += `Add a beautiful lehenga choli - a long skirt (lehenga) with a fitted blouse (choli) and dupatta. Use rich colors like red, maroon, pink, or gold with embroidery. This is festive Indian wear for weddings and celebrations.`;
+      } else {
+        prompt += `Add traditional festive formal wear suitable for celebrations.`;
+      }
+    } else if (clothingType === "traditional-dhoti") {
+      prompt += `Change their outfit to DHOTI KURTA. `;
+      if (gender === "male") {
+        prompt += `Add a traditional dhoti (wrapped lower garment in white or cream) with a formal kurta on top. This is a classic traditional Indian outfit often worn for religious or formal ceremonies.`;
+      } else {
+        prompt += `Add traditional elegant wear suitable for formal occasions.`;
+      }
     } else if (clothingType === "casual-smart") {
       prompt += `Change their outfit to smart casual wear. `;
       prompt += `Add a polo shirt or casual button-down shirt that looks neat and presentable.`;

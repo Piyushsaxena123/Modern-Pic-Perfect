@@ -26,7 +26,9 @@ type ClothingType =
   | "school-uniform" | "office-tie"
   | "school-navy-tie" | "school-red-tie" | "school-green-tie" | "school-maroon-tie"
   | "school-blazer-navy" | "school-blazer-maroon" | "school-blazer-green"
-  | "school-sweater" | "school-cardigan";
+  | "school-sweater" | "school-cardigan"
+  | "traditional-kurta" | "traditional-sherwani" | "traditional-nehru"
+  | "traditional-saree" | "traditional-salwar" | "traditional-lehenga" | "traditional-dhoti";
 
 type Gender = "male" | "female";
 
@@ -62,7 +64,16 @@ const clothingOptions: ClothingOption[] = [
   { id: "formal-shirt", name: "Formal Shirt", description: "Crisp dress shirt for documents", icon: Shirt, category: "office" },
   { id: "blazer", name: "Smart Blazer", description: "Professional blazer look", icon: Crown, category: "office" },
   { id: "casual-smart", name: "Smart Casual", description: "Polo or casual button-down", icon: User, category: "casual" },
-  { id: "traditional", name: "Traditional", description: "Formal traditional attire", icon: Users, category: "traditional" },
+  
+  // Traditional Attire
+  { id: "traditional", name: "Traditional (Classic)", description: "Formal traditional attire", icon: Users, badge: "POPULAR", category: "traditional" },
+  { id: "traditional-kurta", name: "Kurta Pajama", description: "Elegant kurta with churidar", icon: Users, category: "traditional" },
+  { id: "traditional-sherwani", name: "Sherwani", description: "Royal sherwani for formal occasions", icon: Crown, category: "traditional" },
+  { id: "traditional-nehru", name: "Nehru Jacket", description: "Bandhgala/Nehru jacket style", icon: Briefcase, category: "traditional" },
+  { id: "traditional-saree", name: "Saree", description: "Elegant silk saree for women", icon: Users, category: "traditional" },
+  { id: "traditional-salwar", name: "Salwar Kameez", description: "Traditional salwar suit", icon: Users, category: "traditional" },
+  { id: "traditional-lehenga", name: "Lehenga", description: "Festive lehenga choli", icon: Crown, category: "traditional" },
+  { id: "traditional-dhoti", name: "Dhoti Kurta", description: "Classic dhoti with kurta", icon: Users, category: "traditional" },
 ];
 
 const ClothingEditor = ({ onClose }: ClothingEditorProps) => {
