@@ -1,13 +1,40 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Helmet } from "react-helmet-async";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Portfolio from "@/components/Portfolio";
+import About from "@/components/About";
+import Services from "@/components/Services";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <>
+      <Helmet>
+        <title>Picperfect | Professional Photography Services</title>
+        <meta
+          name="description"
+          content="Award-winning professional photographer specializing in portraits, weddings, and commercial photography. Capturing moments that last forever."
+        />
+        <meta
+          name="keywords"
+          content="photography, portrait photography, wedding photographer, commercial photography, professional photographer"
+        />
+        <link rel="canonical" href="https://picperfect.com" />
+      </Helmet>
+
+      <div className="min-h-screen bg-background text-foreground">
+        <Navbar />
+        <main>
+          <Hero />
+          <Portfolio />
+          <About />
+          <Services />
+          <Contact />
+        </main>
+        <Footer />
       </div>
-    </div>
+    </>
   );
 };
 
