@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, imageUrl, maskUrl, scale, style, strength } = await req.json();
+    const { action, imageUrl, maskUrl, mode, style, strength } = await req.json();
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -25,7 +25,13 @@ serve(async (req) => {
 
     switch (action) {
       case "upscale":
-        prompt = `Enhance and upscale this image by ${scale || 2}x. Increase resolution, add detail, sharpen edges, and improve overall quality while maintaining the original composition and colors. Make it ultra high resolution.`;
+        const upscalePrompts: Record<string, string> = {
+          "2x": "Enhance and upscale this image by 2x. Double the resolution, add detail, sharpen edges, and improve overall quality while maintaining the original composition and colors. Make it ultra high resolution.",
+          "4x": "Enhance and upscale this image by 4x. Quadruple the resolution, add significant detail, sharpen edges, and dramatically improve overall quality while maintaining the original composition and colors. Make it ultra high resolution.",
+          "hd": "Enhance and upscale this image to HD resolution (1920x1080). Increase resolution, add detail, sharpen edges, and improve overall quality for HD display. Make it crystal clear and sharp.",
+          "4k": "Enhance and upscale this image to 4K Ultra HD resolution (3840x2160). Dramatically increase resolution, add maximum detail, sharpen edges, and enhance overall quality for 4K displays. Make it ultra high resolution with exceptional clarity.",
+        };
+        prompt = upscalePrompts[mode] || upscalePrompts["2x"];
         break;
 
       case "objectremoval":

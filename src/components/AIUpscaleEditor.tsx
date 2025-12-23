@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X, Upload, Loader2, Download, Sparkles, ZoomIn } from "lucide-react";
+import { X, Upload, Loader2, Download, Sparkles, ZoomIn, Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import BeforeAfterSlider from "./BeforeAfterSlider";
@@ -8,12 +8,21 @@ interface AIUpscaleEditorProps {
   onClose: () => void;
 }
 
+type UpscaleMode = "2x" | "4x" | "hd" | "4k";
+
+const upscaleModes = [
+  { id: "2x" as const, label: "2x", description: "Double resolution" },
+  { id: "4x" as const, label: "4x", description: "Quadruple resolution" },
+  { id: "hd" as const, label: "HD", description: "1920×1080" },
+  { id: "4k" as const, label: "4K", description: "3840×2160" },
+];
+
 const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
   const { toast } = useToast();
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [upscaledImage, setUpscaledImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [scale, setScale] = useState<2 | 4>(2);
+  const [mode, setMode] = useState<UpscaleMode>("2x");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +46,7 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
         body: {
           action: "upscale",
           imageUrl: originalImage,
-          scale,
+          mode,
         },
       });
 
@@ -45,7 +54,8 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
 
       if (data?.imageUrl) {
         setUpscaledImage(data.imageUrl);
-        toast({ title: `Image upscaled ${scale}x successfully!` });
+        const modeLabel = upscaleModes.find(m => m.id === mode)?.label || mode;
+        toast({ title: `Image upscaled to ${modeLabel} successfully!` });
 
         // Save to history
         const { data: { user } } = await supabase.auth.getUser();
@@ -55,7 +65,7 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
             original_image_url: originalImage,
             edited_image_url: data.imageUrl,
             tool_type: "upscale",
-            settings: { scale },
+            settings: { mode },
           });
         }
       }
@@ -75,7 +85,7 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
     if (!upscaledImage) return;
     const link = document.createElement("a");
     link.href = upscaledImage;
-    link.download = `upscaled-${scale}x.png`;
+    link.download = `upscaled-${mode}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -117,21 +127,25 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Scale Selection */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Upscale Factor:</span>
-            <div className="flex gap-2">
-              {([2, 4] as const).map((s) => (
+          {/* Mode Selection */}
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-medium">Upscale Mode:</span>
+            <div className="grid grid-cols-4 gap-3">
+              {upscaleModes.map((m) => (
                 <button
-                  key={s}
-                  onClick={() => setScale(s)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    scale === s
+                  key={m.id}
+                  onClick={() => {
+                    setMode(m.id);
+                    setUpscaledImage(null);
+                  }}
+                  className={`p-3 rounded-xl text-center transition-all ${
+                    mode === m.id
                       ? "bg-primary text-primary-foreground"
                       : "glass hover:bg-primary/10"
                   }`}
                 >
-                  {s}x
+                  <span className="text-sm font-bold block">{m.label}</span>
+                  <span className="text-xs opacity-70 block mt-1">{m.description}</span>
                 </button>
               ))}
             </div>
@@ -143,7 +157,7 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
               beforeImage={originalImage}
               afterImage={upscaledImage}
               beforeLabel="Original"
-              afterLabel={`${scale}x Upscaled`}
+              afterLabel={`${upscaleModes.find(m => m.id === mode)?.label} Upscaled`}
             />
           ) : (
             <div className="aspect-video rounded-2xl overflow-hidden glass">
@@ -179,7 +193,7 @@ const AIUpscaleEditor = ({ onClose }: AIUpscaleEditorProps) => {
               ) : (
                 <>
                   <Sparkles className="w-5 h-5" />
-                  Upscale {scale}x
+                  Upscale to {upscaleModes.find(m => m.id === mode)?.label}
                 </>
               )}
             </button>
