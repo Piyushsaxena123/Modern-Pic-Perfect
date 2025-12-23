@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Move } from "lucide-react";
 
 interface BeforeAfterSliderProps {
@@ -16,7 +16,20 @@ const BeforeAfterSlider = ({
 }: BeforeAfterSliderProps) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+    
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   const handleMove = useCallback(
     (clientX: number) => {
@@ -61,7 +74,7 @@ const BeforeAfterSlider = ({
       <img
         src={afterImage}
         alt={afterLabel}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain bg-secondary/50"
         draggable={false}
       />
 
@@ -73,8 +86,8 @@ const BeforeAfterSlider = ({
         <img
           src={beforeImage}
           alt={beforeLabel}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ width: `${containerRef.current?.offsetWidth || 100}px` }}
+          className="absolute inset-0 h-full object-contain bg-secondary/50"
+          style={{ width: containerWidth > 0 ? `${containerWidth}px` : "100%" }}
           draggable={false}
         />
       </div>
