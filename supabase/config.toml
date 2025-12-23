@@ -1,0 +1,4 @@
+project_id = "becnrbiuvkbtlanytoib"
+
+[functions.ai-clothing]
+verify_jwt = false
