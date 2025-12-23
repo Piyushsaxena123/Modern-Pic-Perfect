@@ -10,6 +10,8 @@ import CropEditor from "@/components/CropEditor";
 import CollageEditor from "@/components/CollageEditor";
 import ConverterEditor from "@/components/ConverterEditor";
 import SaveEditor from "@/components/SaveEditor";
+import CompressEditor from "@/components/CompressEditor";
+import ClothingEditor from "@/components/ClothingEditor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -26,7 +28,7 @@ const Index = () => {
     setSelectedTool(tool);
   };
 
-  const advancedTools = ["filter", "crop", "collage", "converter", "save"];
+  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing"];
 
   return (
     <>
@@ -34,11 +36,11 @@ const Index = () => {
         <title>PicPerfect | Professional Image Editing Tools</title>
         <meta
           name="description"
-          content="Transform your images with PicPerfect. Professional-grade tools for collage, filters, resize, crop, and format conversion. Free online image editor."
+          content="Transform your images with PicPerfect. Professional-grade tools for collage, filters, resize, crop, AI clothing change, and format conversion. Free online image editor."
         />
         <meta
           name="keywords"
-          content="image editor, photo editor, collage maker, image filter, resize image, crop image, image converter, online editor"
+          content="image editor, photo editor, collage maker, image filter, resize image, crop image, image converter, AI clothing changer, passport photo, online editor"
         />
       </Helmet>
 
@@ -75,6 +77,16 @@ const Index = () => {
         {/* Save Editor */}
         {selectedTool === "save" && (
           <SaveEditor onClose={() => setSelectedTool(null)} />
+        )}
+
+        {/* Compress Editor */}
+        {selectedTool === "compress" && (
+          <CompressEditor onClose={() => setSelectedTool(null)} />
+        )}
+
+        {/* AI Clothing Editor */}
+        {selectedTool === "clothing" && (
+          <ClothingEditor onClose={() => setSelectedTool(null)} />
         )}
 
         {/* Other Tool Modals (resize, feedback) */}

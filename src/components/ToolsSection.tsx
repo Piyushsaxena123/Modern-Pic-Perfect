@@ -7,6 +7,10 @@ import {
   FileType,
   MessageSquare,
   ArrowRight,
+  Minimize2,
+  Shirt,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 
 interface ToolsSectionProps {
@@ -17,110 +21,163 @@ const tools = [
   {
     id: "collage",
     icon: LayoutGrid,
-    title: "Collage",
-    description: "Create stunning photo collages with customizable layouts and styles.",
+    title: "Collage Maker",
+    description: "Create stunning photo collages with 8+ layouts and customizable spacing.",
     color: "from-violet-500 to-purple-600",
+    badge: null,
   },
   {
     id: "filter",
     icon: SlidersHorizontal,
-    title: "Filter",
-    description: "Apply professional filters and effects to enhance your photos.",
+    title: "Photo Filters",
+    description: "Apply 8+ professional filters like brightness, contrast, saturation & more.",
     color: "from-pink-500 to-rose-600",
+    badge: null,
   },
   {
-    id: "save",
-    icon: Download,
-    title: "Save",
-    description: "Export your work in multiple formats with quality options.",
-    color: "from-emerald-500 to-teal-600",
+    id: "clothing",
+    icon: Shirt,
+    title: "AI Clothing Changer",
+    description: "Transform casual photos into professional attire for documents & forms.",
+    color: "from-fuchsia-500 to-pink-600",
+    badge: "AI",
   },
   {
-    id: "resize",
-    icon: Maximize2,
-    title: "Resize",
-    description: "Resize images while maintaining aspect ratio and quality.",
-    color: "from-blue-500 to-cyan-600",
+    id: "compress",
+    icon: Minimize2,
+    title: "Image Compressor",
+    description: "Reduce file size up to 80% while maintaining quality. See live preview.",
+    color: "from-amber-500 to-orange-600",
+    badge: "NEW",
   },
   {
     id: "crop",
     icon: Crop,
-    title: "Crop",
-    description: "Precise cropping tools with preset ratios for social media.",
-    color: "from-orange-500 to-amber-600",
+    title: "Visual Crop",
+    description: "Precise cropping with draggable handles & preset ratios for social media.",
+    color: "from-emerald-500 to-teal-600",
+    badge: null,
+  },
+  {
+    id: "resize",
+    icon: Maximize2,
+    title: "Image Resize",
+    description: "Resize images for HD, 4K, Instagram, Twitter with aspect ratio lock.",
+    color: "from-blue-500 to-cyan-600",
+    badge: null,
   },
   {
     id: "converter",
     icon: FileType,
-    title: "Converter",
-    description: "Convert between image formats: PNG, JPG, WebP, and more.",
+    title: "File Converter",
+    description: "Convert JPG, PNG, PDF, WebP & more. 15+ conversion types supported.",
     color: "from-indigo-500 to-blue-600",
+    badge: null,
+  },
+  {
+    id: "save",
+    icon: Download,
+    title: "Batch Save",
+    description: "Export multiple images in PNG, JPG, WebP or PDF format at once.",
+    color: "from-teal-500 to-cyan-600",
+    badge: null,
   },
 ];
 
 const ToolsSection = ({ onToolSelect }: ToolsSectionProps) => {
   return (
     <section id="tools" className="relative py-24 overflow-hidden">
-      {/* Background */}
+      {/* Enhanced Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[300px] bg-accent/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-0 w-[400px] h-[200px] bg-pink-500/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 rounded-full glass text-sm text-primary mb-4">
-            Powerful Tools
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm mb-6 animate-pulse-glow">
+            <Zap className="w-4 h-4 text-primary" />
+            <span className="text-primary font-medium">Powerful Tools</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-6">
             Everything You Need to
             <br />
             <span className="gradient-text">Edit Like a Pro</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional-grade tools designed for both beginners and experts. No downloads required.
+            Professional-grade tools designed for both beginners and experts. No downloads, no signup required.
           </p>
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Tools Grid - Improved layout */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {tools.map((tool, index) => (
             <div
               key={tool.id}
               onClick={() => onToolSelect(tool.id)}
-              className="tool-card opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="group relative p-5 rounded-2xl glass hover-lift cursor-pointer overflow-hidden border border-transparent hover:border-primary/30 transition-all duration-500"
+              style={{ 
+                animationDelay: `${index * 0.05}s`,
+                opacity: 0,
+                animation: `fade-in-up 0.5s ease-out ${index * 0.05}s forwards`
+              }}
             >
-              <div className={`tool-card-icon bg-gradient-to-br ${tool.color}`}>
-                <tool.icon className="w-7 h-7 text-white" />
+              {/* Hover glow effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className={`absolute inset-0 bg-gradient-to-br ${tool.color} opacity-5`} />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2 group-hover:text-primary transition-colors">
+              
+              {/* Badge */}
+              {tool.badge && (
+                <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  tool.badge === "AI" 
+                    ? "bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white" 
+                    : "bg-accent text-accent-foreground"
+                }`}>
+                  {tool.badge === "AI" && <Sparkles className="w-3 h-3 inline mr-0.5 -mt-0.5" />}
+                  {tool.badge}
+                </div>
+              )}
+              
+              {/* Icon */}
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 bg-gradient-to-br ${tool.color}`}>
+                <tool.icon className="w-6 h-6 text-white" />
+              </div>
+              
+              {/* Content */}
+              <h3 className="text-lg font-display font-semibold mb-2 group-hover:text-primary transition-colors">
                 {tool.title}
               </h3>
-              <p className="text-muted-foreground text-sm mb-4">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                 {tool.description}
               </p>
-              <div className="flex items-center gap-1 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>Try Now</span>
+              
+              {/* CTA */}
+              <div className="flex items-center gap-1 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
+                <span>Open Tool</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
           ))}
         </div>
 
-        {/* Feedback CTA */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 glass rounded-2xl p-6">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-left">
-              <h4 className="font-display font-semibold">Have Feedback?</h4>
-              <p className="text-sm text-muted-foreground">We'd love to hear from you</p>
+        {/* Feedback CTA - Enhanced */}
+        <div className="mt-20 text-center">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-6 glass-strong rounded-2xl p-8">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-float">
+                <MessageSquare className="w-7 h-7 text-white" />
+              </div>
+              <div className="text-left">
+                <h4 className="font-display font-semibold text-lg">Have Feedback?</h4>
+                <p className="text-sm text-muted-foreground">Help us improve PicPerfect</p>
+              </div>
             </div>
             <button
               onClick={() => onToolSelect("feedback")}
-              className="btn-primary text-sm ml-4"
+              className="btn-secondary hover:btn-primary transition-all"
             >
               Share Feedback
             </button>
