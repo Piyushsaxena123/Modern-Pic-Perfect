@@ -1,6 +1,23 @@
 import { Mail, MapPin, Send, Github, Twitter, Linkedin, Instagram } from "lucide-react";
 
-const FooterSection = () => {
+interface FooterSectionProps {
+  onNavigate?: (section: string) => void;
+}
+
+const FooterSection = ({ onNavigate }: FooterSectionProps) => {
+  const handleLinkClick = (link: string) => {
+    const sectionMap: Record<string, string> = {
+      Home: "home",
+      Tools: "tools",
+      About: "about",
+      Contact: "contact",
+    };
+    
+    if (onNavigate && sectionMap[link]) {
+      onNavigate(sectionMap[link]);
+    }
+  };
+
   return (
     <footer className="relative py-16 border-t border-border overflow-hidden">
       {/* Background */}
@@ -40,9 +57,12 @@ const FooterSection = () => {
             <ul className="space-y-3">
               {["Home", "Tools", "About", "Contact"].map((link) => (
                 <li key={link}>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <button 
+                    onClick={() => handleLinkClick(link)}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
                     {link}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>

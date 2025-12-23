@@ -3,6 +3,8 @@ import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ToolsSection from "@/components/ToolsSection";
+import AboutSection from "@/components/AboutSection";
+import ContactSection from "@/components/ContactSection";
 import FooterSection from "@/components/FooterSection";
 import ToolModal from "@/components/ToolModal";
 import FilterEditor from "@/components/FilterEditor";
@@ -28,8 +30,14 @@ const Index = () => {
 
   const handleNavigate = (section: string) => {
     setActiveSection(section);
-    if (section === "tools") {
-      document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
+    
+    if (section === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -81,9 +89,11 @@ const Index = () => {
         <main>
           <HeroSection onGetStarted={() => handleNavigate("tools")} />
           <ToolsSection onToolSelect={handleToolSelect} />
+          <AboutSection />
+          <ContactSection />
         </main>
 
-        <FooterSection />
+        <FooterSection onNavigate={handleNavigate} />
 
         {/* Full-screen Tool Editors */}
         {selectedTool && advancedTools.includes(selectedTool) && (
