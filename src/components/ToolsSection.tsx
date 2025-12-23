@@ -11,6 +11,8 @@ import {
   Shirt,
   Sparkles,
   Zap,
+  ImageOff,
+  Smile,
 } from "lucide-react";
 
 interface ToolsSectionProps {
@@ -41,6 +43,22 @@ const tools = [
     description: "Transform casual photos into professional attire for documents & forms.",
     color: "from-fuchsia-500 to-pink-600",
     badge: "AI",
+  },
+  {
+    id: "bgremove",
+    icon: ImageOff,
+    title: "Background Remover",
+    description: "Remove backgrounds instantly with AI. Perfect for passport & product photos.",
+    color: "from-cyan-500 to-blue-600",
+    badge: "AI",
+  },
+  {
+    id: "faceenhance",
+    icon: Smile,
+    title: "Face Enhancer",
+    description: "Skin smoothing, teeth whitening, blemish removal for professional photos.",
+    color: "from-rose-500 to-pink-600",
+    badge: "PRO",
   },
   {
     id: "compress",
@@ -107,12 +125,12 @@ const ToolsSection = ({ onToolSelect }: ToolsSectionProps) => {
             <span className="gradient-text">Edit Like a Pro</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional-grade tools designed for both beginners and experts. No downloads, no signup required.
+            Professional-grade tools designed for both beginners and experts. No downloads required.
           </p>
         </div>
 
         {/* Tools Grid - Improved layout */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {tools.map((tool, index) => (
             <div
               key={tool.id}
@@ -134,6 +152,8 @@ const ToolsSection = ({ onToolSelect }: ToolsSectionProps) => {
                 <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   tool.badge === "AI" 
                     ? "bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white" 
+                    : tool.badge === "PRO"
+                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
                     : "bg-accent text-accent-foreground"
                 }`}>
                   {tool.badge === "AI" && <Sparkles className="w-3 h-3 inline mr-0.5 -mt-0.5" />}
@@ -147,17 +167,17 @@ const ToolsSection = ({ onToolSelect }: ToolsSectionProps) => {
               </div>
               
               {/* Content */}
-              <h3 className="text-lg font-display font-semibold mb-2 group-hover:text-primary transition-colors">
+              <h3 className="text-base font-display font-semibold mb-2 group-hover:text-primary transition-colors">
                 {tool.title}
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+              <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">
                 {tool.description}
               </p>
               
               {/* CTA */}
-              <div className="flex items-center gap-1 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
+              <div className="flex items-center gap-1 text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
                 <span>Open Tool</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3 h-3" />
               </div>
             </div>
           ))}

@@ -12,6 +12,8 @@ import ConverterEditor from "@/components/ConverterEditor";
 import SaveEditor from "@/components/SaveEditor";
 import CompressEditor from "@/components/CompressEditor";
 import ClothingEditor from "@/components/ClothingEditor";
+import FaceEnhanceEditor from "@/components/FaceEnhanceEditor";
+import BackgroundRemover from "@/components/BackgroundRemover";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -28,7 +30,22 @@ const Index = () => {
     setSelectedTool(tool);
   };
 
-  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing"];
+  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing", "faceenhance", "bgremove"];
+
+  const getToolTitle = (tool: string) => {
+    const titles: Record<string, string> = {
+      filter: "Photo Filters",
+      crop: "Visual Crop",
+      collage: "Collage Maker",
+      converter: "File Converter",
+      save: "Batch Save",
+      compress: "Image Compressor",
+      clothing: "AI Clothing Changer",
+      faceenhance: "Face Enhancer",
+      bgremove: "Background Remover",
+    };
+    return titles[tool] || tool;
+  };
 
   return (
     <>
@@ -36,11 +53,11 @@ const Index = () => {
         <title>PicPerfect | Professional Image Editing Tools</title>
         <meta
           name="description"
-          content="Transform your images with PicPerfect. Professional-grade tools for collage, filters, resize, crop, AI clothing change, and format conversion. Free online image editor."
+          content="Transform your images with PicPerfect. Professional-grade tools for collage, filters, resize, crop, AI clothing change, face enhancement, background removal and format conversion. Free online image editor."
         />
         <meta
           name="keywords"
-          content="image editor, photo editor, collage maker, image filter, resize image, crop image, image converter, AI clothing changer, passport photo, online editor"
+          content="image editor, photo editor, collage maker, image filter, resize image, crop image, image converter, AI clothing changer, passport photo, background remover, face enhancer, online editor"
         />
       </Helmet>
 
@@ -54,39 +71,34 @@ const Index = () => {
 
         <FooterSection />
 
-        {/* Filter Editor */}
-        {selectedTool === "filter" && (
-          <FilterEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* Crop Editor */}
-        {selectedTool === "crop" && (
-          <CropEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* Collage Editor */}
-        {selectedTool === "collage" && (
-          <CollageEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* Converter Editor */}
-        {selectedTool === "converter" && (
-          <ConverterEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* Save Editor */}
-        {selectedTool === "save" && (
-          <SaveEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* Compress Editor */}
-        {selectedTool === "compress" && (
-          <CompressEditor onClose={() => setSelectedTool(null)} />
-        )}
-
-        {/* AI Clothing Editor */}
-        {selectedTool === "clothing" && (
-          <ClothingEditor onClose={() => setSelectedTool(null)} />
+        {/* Full-screen Tool Editors */}
+        {selectedTool && advancedTools.includes(selectedTool) && (
+          <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+            <div className="sticky top-0 z-10 glass-strong border-b border-border">
+              <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <h2 className="text-xl font-display font-bold gradient-text">
+                  {getToolTitle(selectedTool)}
+                </h2>
+                <button
+                  onClick={() => setSelectedTool(null)}
+                  className="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
+                >
+                  ← Back to Tools
+                </button>
+              </div>
+            </div>
+            <div className="max-w-7xl mx-auto px-4 py-8">
+              {selectedTool === "filter" && <FilterEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "crop" && <CropEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "collage" && <CollageEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "converter" && <ConverterEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "save" && <SaveEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "compress" && <CompressEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "clothing" && <ClothingEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "faceenhance" && <FaceEnhanceEditor />}
+              {selectedTool === "bgremove" && <BackgroundRemover />}
+            </div>
+          </div>
         )}
 
         {/* Other Tool Modals (resize, feedback) */}

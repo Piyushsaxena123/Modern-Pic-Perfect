@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Menu, X, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Menu, X, Sparkles, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface NavbarProps {
   activeSection: string;
@@ -15,16 +24,15 @@ const navItems = [
 
 const Navbar = ({ activeSection, onNavigate }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-strong">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <button
-            onClick={() => onNavigate("home")}
-            className="flex items-center gap-2 group"
-          >
+          <button onClick={() => onNavigate("home")} className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
@@ -46,17 +54,33 @@ const Navbar = ({ activeSection, onNavigate }: NavbarProps) => {
             ))}
           </div>
 
-          {/* CTA Buttons */}
+          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <button className="btn-secondary text-sm">Sign In</button>
-            <button className="btn-primary text-sm">Get Started</button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <User className="w-4 h-4" />
+                    {user.email?.split("@")[0]}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={signOut} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <button onClick={() => navigate("/auth")} className="btn-secondary text-sm">Sign In</button>
+                <button onClick={() => navigate("/auth")} className="btn-primary text-sm">Get Started</button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-foreground"
-          >
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-foreground">
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
@@ -68,22 +92,23 @@ const Navbar = ({ activeSection, onNavigate }: NavbarProps) => {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    onNavigate(item.id);
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => { onNavigate(item.id); setMobileMenuOpen(false); }}
                   className={`py-3 px-4 text-left rounded-lg transition-colors ${
-                    activeSection === item.id
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-secondary"
+                    activeSection === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
                   }`}
                 >
                   {item.label}
                 </button>
               ))}
               <div className="flex gap-3 mt-4">
-                <button className="btn-secondary flex-1 text-sm">Sign In</button>
-                <button className="btn-primary flex-1 text-sm">Get Started</button>
+                {user ? (
+                  <button onClick={signOut} className="btn-secondary flex-1 text-sm">Sign Out</button>
+                ) : (
+                  <>
+                    <button onClick={() => navigate("/auth")} className="btn-secondary flex-1 text-sm">Sign In</button>
+                    <button onClick={() => navigate("/auth")} className="btn-primary flex-1 text-sm">Get Started</button>
+                  </>
+                )}
               </div>
             </div>
           </div>
