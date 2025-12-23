@@ -6,6 +6,7 @@ import ToolsSection from "@/components/ToolsSection";
 import FooterSection from "@/components/FooterSection";
 import ToolModal from "@/components/ToolModal";
 import FilterEditor from "@/components/FilterEditor";
+import CropEditor from "@/components/CropEditor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -51,8 +52,13 @@ const Index = () => {
           <FilterEditor onClose={() => setSelectedTool(null)} />
         )}
 
+        {/* Crop Editor (Advanced) */}
+        {selectedTool === "crop" && (
+          <CropEditor onClose={() => setSelectedTool(null)} />
+        )}
+
         {/* Other Tool Modals */}
-        {selectedTool && selectedTool !== "filter" && (
+        {selectedTool && selectedTool !== "filter" && selectedTool !== "crop" && (
           <ToolModal tool={selectedTool} onClose={() => setSelectedTool(null)} />
         )}
       </div>
