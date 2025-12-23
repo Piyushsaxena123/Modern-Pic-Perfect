@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ai-background]
 verify_jwt = false
+
+[functions.ai-image-edit]
+verify_jwt = false

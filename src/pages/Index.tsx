@@ -17,6 +17,10 @@ import BackgroundRemover from "@/components/BackgroundRemover";
 import PassportCropper from "@/components/PassportCropper";
 import BatchProcessor from "@/components/BatchProcessor";
 import ImageToDocumentConverter from "@/components/ImageToDocumentConverter";
+import ImageGallery from "@/components/ImageGallery";
+import AIUpscaleEditor from "@/components/AIUpscaleEditor";
+import AIObjectRemovalEditor from "@/components/AIObjectRemovalEditor";
+import AIStyleTransferEditor from "@/components/AIStyleTransferEditor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -33,7 +37,7 @@ const Index = () => {
     setSelectedTool(tool);
   };
 
-  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing", "faceenhance", "bgremove", "passport", "batch", "imagetodoc"];
+  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing", "faceenhance", "bgremove", "passport", "batch", "imagetodoc", "gallery", "upscale", "objectremove", "styletransfer"];
 
   const getToolTitle = (tool: string) => {
     const titles: Record<string, string> = {
@@ -49,6 +53,10 @@ const Index = () => {
       passport: "Passport Photo Cropper",
       batch: "Batch Processor",
       imagetodoc: "Images to Document",
+      gallery: "Image Gallery",
+      upscale: "AI Image Upscaler",
+      objectremove: "AI Object Removal",
+      styletransfer: "AI Style Transfer",
     };
     return titles[tool] || tool;
   };
@@ -106,6 +114,10 @@ const Index = () => {
               {selectedTool === "passport" && <PassportCropper />}
               {selectedTool === "batch" && <BatchProcessor />}
               {selectedTool === "imagetodoc" && <ImageToDocumentConverter onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "gallery" && <ImageGallery onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "upscale" && <AIUpscaleEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "objectremove" && <AIObjectRemovalEditor onClose={() => setSelectedTool(null)} />}
+              {selectedTool === "styletransfer" && <AIStyleTransferEditor onClose={() => setSelectedTool(null)} />}
             </div>
           </div>
         )}
