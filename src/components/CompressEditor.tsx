@@ -1,14 +1,17 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
   X,
   Upload,
   Download,
   Minimize2,
-  Image,
+  FileIcon,
   Check,
   Loader2,
   ArrowRight,
   Sparkles,
+  Image,
+  FileText,
+  File,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,21 +19,22 @@ interface CompressEditorProps {
   onClose: () => void;
 }
 
-interface ImageFile {
+interface ProcessedFile {
   id: string;
   file: File;
   url: string;
   originalSize: number;
   compressedSize: number | null;
   compressedBlob: Blob | null;
+  type: "image" | "pdf" | "other";
 }
 
 const CompressEditor = ({ onClose }: CompressEditorProps) => {
   const { toast } = useToast();
-  const [images, setImages] = useState<ImageFile[]>([]);
+  const [files, setFiles] = useState<ProcessedFile[]>([]);
   const [quality, setQuality] = useState(75);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [format, setFormat] = useState<"jpeg" | "webp">("jpeg");
+  const [format, setFormat] = useState<"jpeg" | "webp" | "png">("jpeg");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,7 +49,21 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
     return savings.toFixed(1);
   };
 
-  const compressImage = async (file: File, quality: number, format: "jpeg" | "webp"): Promise<Blob> => {
+  const getFileType = (file: File): "image" | "pdf" | "other" => {
+    if (file.type.startsWith("image/")) return "image";
+    if (file.type === "application/pdf") return "pdf";
+    return "other";
+  };
+
+  const getFileIcon = (type: "image" | "pdf" | "other") => {
+    switch (type) {
+      case "image": return Image;
+      case "pdf": return FileText;
+      default: return File;
+    }
+  };
+
+  const compressImage = async (file: File, quality: number, format: "jpeg" | "webp" | "png"): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new window.Image();
       img.onload = () => {
@@ -67,13 +85,16 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
         
         ctx.drawImage(img, 0, 0);
         
+        const mimeType = format === "png" ? "image/png" : `image/${format}`;
+        const q = format === "png" ? undefined : quality / 100;
+        
         canvas.toBlob(
           (blob) => {
             if (blob) resolve(blob);
             else reject(new Error("Failed to compress image"));
           },
-          `image/${format}`,
-          quality / 100
+          mimeType,
+          q
         );
       };
       img.onerror = reject;
@@ -81,22 +102,29 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
     });
   };
 
-  const handleFileUpload = useCallback((files: FileList | null) => {
-    if (!files) return;
+  const handleFileUpload = useCallback((fileList: FileList | null) => {
+    if (!fileList) return;
     
-    const newImages: ImageFile[] = Array.from(files)
-      .filter(f => f.type.startsWith("image/"))
-      .map(file => ({
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        file,
-        url: URL.createObjectURL(file),
-        originalSize: file.size,
-        compressedSize: null,
-        compressedBlob: null,
-      }));
+    const newFiles: ProcessedFile[] = Array.from(fileList).map(file => ({
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      file,
+      url: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
+      originalSize: file.size,
+      compressedSize: null,
+      compressedBlob: null,
+      type: getFileType(file),
+    }));
     
-    setImages(prev => [...prev, ...newImages]);
-    toast({ title: `${newImages.length} image(s) added` });
+    setFiles(prev => [...prev, ...newFiles]);
+    
+    const imageCount = newFiles.filter(f => f.type === "image").length;
+    const otherCount = newFiles.length - imageCount;
+    
+    let msg = "";
+    if (imageCount > 0) msg += `${imageCount} image(s)`;
+    if (otherCount > 0) msg += (msg ? " and " : "") + `${otherCount} other file(s)`;
+    
+    toast({ title: `${msg} added` });
   }, [toast]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -104,58 +132,65 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
     handleFileUpload(e.dataTransfer.files);
   }, [handleFileUpload]);
 
-  const removeImage = (id: string) => {
-    setImages(prev => prev.filter(img => img.id !== id));
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
   };
 
-  // Re-compress when quality or format changes
-  useEffect(() => {
-    const compressAll = async () => {
-      if (images.length === 0) return;
-      
-      const updatedImages = await Promise.all(
-        images.map(async (img) => {
-          try {
-            const blob = await compressImage(img.file, quality, format);
-            return { ...img, compressedSize: blob.size, compressedBlob: blob };
-          } catch {
-            return img;
+  const compressAll = async () => {
+    setIsProcessing(true);
+    
+    try {
+      const updatedFiles = await Promise.all(
+        files.map(async (f) => {
+          if (f.type === "image") {
+            try {
+              const blob = await compressImage(f.file, quality, format);
+              return { ...f, compressedSize: blob.size, compressedBlob: blob };
+            } catch {
+              return f;
+            }
           }
+          // For non-image files, just keep original (compression not supported client-side)
+          return { ...f, compressedSize: f.originalSize, compressedBlob: f.file };
         })
       );
       
-      setImages(updatedImages);
-    };
-    
-    compressAll();
-  }, [quality, format, images.length]);
-
-  const handleDownloadAll = async () => {
-    setIsProcessing(true);
-    try {
-      for (const img of images) {
-        if (img.compressedBlob) {
-          const url = URL.createObjectURL(img.compressedBlob);
-          const link = document.createElement("a");
-          link.href = url;
-          const baseName = img.file.name.replace(/\.[^/.]+$/, "");
-          link.download = `${baseName}-compressed.${format === "jpeg" ? "jpg" : "webp"}`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      }
-      toast({ title: "Images downloaded!", description: `${images.length} compressed image(s) saved.` });
+      setFiles(updatedFiles);
+      toast({ title: "Compression complete!", description: "Files are ready to download." });
     } catch (error) {
-      toast({ title: "Error", description: "Failed to download images.", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to compress some files.", variant: "destructive" });
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const totalOriginal = images.reduce((sum, img) => sum + img.originalSize, 0);
-  const totalCompressed = images.reduce((sum, img) => sum + (img.compressedSize || img.originalSize), 0);
+  const handleDownloadAll = async () => {
+    for (const f of files) {
+      const blob = f.compressedBlob || f.file;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      
+      if (f.type === "image" && f.compressedBlob) {
+        const baseName = f.file.name.replace(/\.[^/.]+$/, "");
+        const ext = format === "jpeg" ? "jpg" : format;
+        link.download = `${baseName}-compressed.${ext}`;
+      } else {
+        link.download = f.file.name;
+      }
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+    
+    toast({ title: "Files downloaded!", description: `${files.length} file(s) saved.` });
+  };
+
+  const totalOriginal = files.reduce((sum, f) => sum + f.originalSize, 0);
+  const totalCompressed = files.reduce((sum, f) => sum + (f.compressedSize || f.originalSize), 0);
+  const hasCompressed = files.some(f => f.compressedBlob !== null);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -169,19 +204,18 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
               <Minimize2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-display font-semibold">Image Compressor</h3>
-              <p className="text-xs text-muted-foreground">Reduce file size while maintaining quality</p>
+              <h3 className="text-xl font-display font-semibold">File Compressor</h3>
+              <p className="text-xs text-muted-foreground">Compress images and files</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {images.length > 0 && (
+            {files.length > 0 && hasCompressed && (
               <button
                 onClick={handleDownloadAll}
-                disabled={isProcessing}
                 className="btn-primary text-sm flex items-center gap-2"
               >
-                {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                {isProcessing ? "Saving..." : "Download All"}
+                <Download className="w-4 h-4" />
+                Download All
               </button>
             )}
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-secondary transition-colors">
@@ -200,7 +234,7 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
               multiple
               onChange={(e) => handleFileUpload(e.target.files)}
               className="hidden"
@@ -209,15 +243,15 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
               <div className="w-16 h-16 rounded-2xl glass mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Upload className="w-8 h-8 text-primary" />
               </div>
-              <p className="text-lg font-medium mb-2">Drop images to compress</p>
-              <p className="text-sm text-muted-foreground">Supports JPG, PNG, WebP</p>
+              <p className="text-lg font-medium mb-2">Drop files to compress</p>
+              <p className="text-sm text-muted-foreground">Images (JPG, PNG, WebP) • Documents (PDF, Word, Excel)</p>
             </div>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6">
-            {/* Images list */}
+            {/* Files list */}
             <div className="lg:col-span-2 space-y-4">
-              {images.length > 0 ? (
+              {files.length > 0 ? (
                 <>
                   {/* Summary */}
                   <div className="p-4 glass rounded-xl flex items-center justify-between">
@@ -240,56 +274,64 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
                     </div>
                   </div>
 
-                  {/* Image cards */}
+                  {/* File cards */}
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {images.map((img) => (
-                      <div key={img.id} className="flex items-center gap-4 p-3 glass rounded-xl group">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-secondary">
-                          <img src={img.url} alt="" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{img.file.name}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">
-                              {formatFileSize(img.originalSize)}
-                            </span>
-                            <ArrowRight className="w-3 h-3 text-primary" />
-                            <span className="text-xs text-primary font-medium">
-                              {img.compressedSize ? formatFileSize(img.compressedSize) : "..."}
-                            </span>
-                            {img.compressedSize && (
-                              <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">
-                                -{calculateSavings(img.originalSize, img.compressedSize)}%
-                              </span>
+                    {files.map((f) => {
+                      const IconComponent = getFileIcon(f.type);
+                      return (
+                        <div key={f.id} className="flex items-center gap-4 p-3 glass rounded-xl group">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-secondary flex items-center justify-center">
+                            {f.type === "image" && f.url ? (
+                              <img src={f.url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <IconComponent className="w-8 h-8 text-muted-foreground" />
                             )}
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{f.file.name}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-muted-foreground">
+                                {formatFileSize(f.originalSize)}
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-primary" />
+                              <span className="text-xs text-primary font-medium">
+                                {f.compressedSize ? formatFileSize(f.compressedSize) : "..."}
+                              </span>
+                              {f.compressedSize && f.compressedSize < f.originalSize && (
+                                <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">
+                                  -{calculateSavings(f.originalSize, f.compressedSize)}%
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1 capitalize">{f.type}</p>
+                          </div>
+                          <button
+                            onClick={() => removeFile(f.id)}
+                            className="p-1.5 rounded-lg hover:bg-destructive/20 text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeImage(img.id)}
-                          className="p-1.5 rounded-lg hover:bg-destructive/20 text-destructive opacity-0 group-hover:opacity-100 transition-all"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No images added yet</p>
+                  <FileIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No files added yet</p>
                 </div>
               )}
             </div>
 
             {/* Controls */}
             <div className="space-y-6">
-              {/* Quality slider */}
+              {/* Quality slider (for images) */}
               <div className="p-4 glass rounded-xl">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    Quality
+                    Image Quality
                   </label>
                   <span className="text-lg font-bold text-primary">{quality}%</span>
                 </div>
@@ -309,9 +351,9 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
 
               {/* Format selection */}
               <div className="p-4 glass rounded-xl">
-                <label className="text-sm font-medium mb-3 block">Output Format</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["jpeg", "webp"] as const).map((fmt) => (
+                <label className="text-sm font-medium mb-3 block">Image Output Format</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["jpeg", "webp", "png"] as const).map((fmt) => (
                     <button
                       key={fmt}
                       onClick={() => setFormat(fmt)}
@@ -322,14 +364,27 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
                       }`}
                     >
                       <span className="font-medium text-sm">{fmt.toUpperCase()}</span>
-                      <span className="text-xs opacity-80">
-                        {fmt === "jpeg" ? "Universal" : "Best compression"}
+                      <span className="text-[10px] opacity-80">
+                        {fmt === "jpeg" ? "Universal" : fmt === "webp" ? "Best" : "Lossless"}
                       </span>
                       {format === fmt && <Check className="w-4 h-4 mt-1" />}
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Compress Button */}
+              <button
+                onClick={compressAll}
+                disabled={files.length === 0 || isProcessing}
+                className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isProcessing ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" />Compressing...</>
+                ) : (
+                  <><Minimize2 className="w-5 h-5" />Compress Files</>
+                )}
+              </button>
 
               {/* Tips */}
               <div className="p-4 glass rounded-xl">
@@ -340,7 +395,8 @@ const CompressEditor = ({ onClose }: CompressEditorProps) => {
                 <ul className="space-y-1 text-xs text-muted-foreground">
                   <li>• 70-80% is ideal for photos</li>
                   <li>• WebP offers 25-35% better compression</li>
-                  <li>• Lower quality for web, higher for print</li>
+                  <li>• PNG is lossless (no quality loss)</li>
+                  <li>• Non-image files keep original size</li>
                 </ul>
               </div>
             </div>
