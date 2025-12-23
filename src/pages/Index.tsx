@@ -1,38 +1,48 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Portfolio from "@/components/Portfolio";
-import About from "@/components/About";
-import Services from "@/components/Services";
-import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import AppSidebar from "@/components/AppSidebar";
+import TopBar from "@/components/TopBar";
+import MainContent from "@/components/MainContent";
 
 const Index = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState("collage");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleItemClick = (item: string) => {
+    setActiveItem(item);
+    setSidebarOpen(false);
+  };
+
   return (
     <>
       <Helmet>
-        <title>Picperfect | Professional Photography Services</title>
+        <title>Pic Perfect | Image Editing Tools</title>
         <meta
           name="description"
-          content="Award-winning professional photographer specializing in portraits, weddings, and commercial photography. Capturing moments that last forever."
+          content="Professional image editing tools - Create collages, apply filters, resize, crop, and convert your images with ease."
         />
         <meta
           name="keywords"
-          content="photography, portrait photography, wedding photographer, commercial photography, professional photographer"
+          content="image editor, collage maker, photo filter, resize images, crop photos, image converter"
         />
-        <link rel="canonical" href="https://picperfect.com" />
       </Helmet>
 
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <main>
-          <Hero />
-          <Portfolio />
-          <About />
-          <Services />
-          <Contact />
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-background text-foreground overflow-hidden">
+        <AppSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          activeItem={activeItem}
+          onItemClick={handleItemClick}
+        />
+
+        <TopBar
+          onMenuClick={() => setSidebarOpen(true)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+
+        <MainContent activeItem={activeItem} />
       </div>
     </>
   );
