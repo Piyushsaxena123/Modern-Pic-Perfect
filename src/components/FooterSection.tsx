@@ -19,16 +19,16 @@ const FooterSection = () => {
               Professional image editing tools for everyone. Create, edit, and share stunning visuals with ease.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
+              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
+              <a href="https://in.linkedin.com/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
+              <a href="https://github.com/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-primary/10 transition-colors">
                 <Github className="w-5 h-5" />
               </a>
             </div>
