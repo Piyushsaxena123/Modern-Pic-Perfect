@@ -15,6 +15,7 @@ import {
   Smile,
   Camera,
   Layers,
+  FileText,
 } from "lucide-react";
 
 interface ToolsSectionProps {
@@ -117,6 +118,14 @@ const tools = [
     description: "Export multiple images in PNG, JPG, WebP or PDF format at once.",
     color: "from-teal-500 to-cyan-600",
     badge: null,
+  },
+  {
+    id: "imagetodoc",
+    icon: FileText,
+    title: "Images to Document",
+    description: "Convert 100+ images to PDF, PPT, or Word document in one click.",
+    color: "from-blue-500 to-indigo-600",
+    badge: "NEW",
   },
 ];
 

@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, Loader2, ImageOff, Sparkles, Palette, Image as ImageIcon } from "lucide-react";
+import { Upload, Download, Loader2, ImageOff, Sparkles, Palette, Image as ImageIcon, Cpu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { removeBackground, loadImageFromUrl } from "@/lib/backgroundRemoval";
 
 type BackgroundType = "transparent" | "color" | "custom";
 
@@ -43,6 +43,7 @@ const BackgroundRemover = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [loadingModel, setLoadingModel] = useState(false);
   const [backgroundType, setBackgroundType] = useState<BackgroundType>("transparent");
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
   const [customColor, setCustomColor] = useState("#FFFFFF");
@@ -79,44 +80,39 @@ const BackgroundRemover = () => {
     }
   }, []);
 
-  const removeBackground = useCallback(async () => {
+  const processBackground = useCallback(async () => {
     if (!originalImage) return;
 
     setProcessing(true);
+    setLoadingModel(true);
 
     try {
-      // Build prompt based on background type
-      let prompt = "Remove the background from this image completely. ";
+      toast({ title: "Loading AI model...", description: "This may take a moment on first use." });
       
-      if (backgroundType === "transparent") {
-        prompt += "Make the background fully transparent, keeping only the main subject (person or object) in the image. The result should be suitable for a passport photo or product image with no background.";
-      } else if (backgroundType === "color") {
-        prompt += `Replace the background with a solid ${selectedColor === "#FFFFFF" ? "white" : selectedColor === "#E3F2FD" ? "light blue" : selectedColor === "#1976D2" ? "blue" : selectedColor === "#D32F2F" ? "red" : selectedColor === "#388E3C" ? "green" : selectedColor === "#1A237E" ? "navy blue" : "colored"} background. Keep only the main subject and replace everything else with this solid color background. Make it look professional, suitable for official documents.`;
-      } else if (backgroundType === "custom" && customBackground) {
-        prompt += "Remove the background and prepare the subject for compositing onto a new background.";
+      // Load the original image
+      const imgElement = await loadImageFromUrl(originalImage);
+      setLoadingModel(false);
+      
+      // Load custom background if needed
+      let backgroundImage: HTMLImageElement | undefined;
+      if (backgroundType === "custom" && customBackground) {
+        backgroundImage = await loadImageFromUrl(customBackground);
       }
 
-      const { data, error } = await supabase.functions.invoke("ai-background", {
-        body: {
-          imageBase64: originalImage,
-          backgroundType,
-          backgroundColor: selectedColor,
-          customBackground: backgroundType === "custom" ? customBackground : null,
-          prompt
-        }
+      // Process with in-browser AI
+      const resultBlob = await removeBackground(imgElement, {
+        backgroundColor: backgroundType === "color" ? selectedColor : undefined,
+        backgroundImage: backgroundImage,
       });
 
-      if (error) throw error;
-
-      if (data.error) {
-        toast({ title: "Error", description: data.error, variant: "destructive" });
-        return;
-      }
-
-      if (data.image) {
-        setProcessedImage(data.image);
+      // Convert blob to data URL for display
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProcessedImage(reader.result as string);
         toast({ title: "Success!", description: "Background processed successfully." });
-      }
+      };
+      reader.readAsDataURL(resultBlob);
+
     } catch (error: any) {
       console.error("Background removal error:", error);
       toast({
@@ -126,6 +122,7 @@ const BackgroundRemover = () => {
       });
     } finally {
       setProcessing(false);
+      setLoadingModel(false);
     }
   }, [originalImage, backgroundType, selectedColor, customBackground, toast]);
 
@@ -139,6 +136,17 @@ const BackgroundRemover = () => {
 
   return (
     <div className="space-y-6">
+      {/* Info Banner */}
+      <div className="p-4 glass rounded-xl border border-primary/20">
+        <div className="flex items-center gap-3">
+          <Cpu className="w-5 h-5 text-primary" />
+          <div>
+            <p className="text-sm font-medium">Powered by On-Device AI</p>
+            <p className="text-xs text-muted-foreground">Your images are processed locally - never uploaded to any server</p>
+          </div>
+        </div>
+      </div>
+
       {/* Upload Area */}
       {!originalImage ? (
         <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition-colors bg-secondary/30">
@@ -184,7 +192,8 @@ const BackgroundRemover = () => {
                         {processing ? (
                           <div className="space-y-3">
                             <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-                            <p className="text-sm">Processing with AI...</p>
+                            <p className="text-sm">{loadingModel ? "Loading AI model..." : "Processing..."}</p>
+                            {loadingModel && <p className="text-xs">First time may take 30-60 seconds</p>}
                           </div>
                         ) : (
                           <p className="text-sm">Result will appear here</p>
@@ -348,9 +357,9 @@ const BackgroundRemover = () => {
               </div>
 
               {/* Process Button */}
-              <Button onClick={removeBackground} disabled={processing} className="w-full h-14 text-lg btn-primary">
+              <Button onClick={processBackground} disabled={processing} className="w-full h-14 text-lg btn-primary">
                 {processing ? (
-                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Processing...</>
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{loadingModel ? "Loading Model..." : "Processing..."}</>
                 ) : (
                   <><Sparkles className="w-5 h-5 mr-2" />Remove & Replace Background</>
                 )}
@@ -362,7 +371,8 @@ const BackgroundRemover = () => {
                 <ul className="list-disc list-inside space-y-1 text-xs">
                   <li>Use clear, high-contrast images</li>
                   <li>Works best with portraits and product photos</li>
-                  <li>White/solid color backgrounds give best results for passport photos</li>
+                  <li>First processing loads the AI model (30-60 sec)</li>
+                  <li>Subsequent processing is much faster</li>
                 </ul>
               </div>
             </div>
