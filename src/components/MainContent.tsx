@@ -1,5 +1,9 @@
-import { useState } from "react";
-import heroCamera from "@/assets/hero-camera.png";
+import { useState, useEffect } from "react";
+import heroPhoto1 from "@/assets/hero-photo-1.jpg";
+import heroPhoto2 from "@/assets/hero-photo-2.jpg";
+import heroPhoto3 from "@/assets/hero-photo-3.jpg";
+
+const heroImages = [heroPhoto1, heroPhoto2, heroPhoto3];
 
 interface MainContentProps {
   activeItem: string;
@@ -38,16 +42,29 @@ const contentTitles: Record<string, { title: string; description: string }> = {
 
 const MainContent = ({ activeItem }: MainContentProps) => {
   const content = contentTitles[activeItem] || contentTitles.collage;
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <main className="fixed inset-0 lg:left-72">
-      {/* Background Image */}
+      {/* Background Images Carousel */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={heroCamera}
-          alt="Professional DSLR Camera"
-          className="w-full h-full object-cover object-center"
-        />
+        {heroImages.map((image, index) => (
+          <img
+            key={index}
+            src={image}
+            alt="Professional photography"
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
+              index === currentImage ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-background/40" />
       </div>

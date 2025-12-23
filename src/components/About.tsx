@@ -1,5 +1,5 @@
 import { Camera, Award, Users, Image } from "lucide-react";
-import heroCamera from "@/assets/hero-camera.png";
+import heroPhoto1 from "@/assets/hero-photo-1.jpg";
 
 const stats = [
   { icon: Camera, value: "15+", label: "Years Experience" },
@@ -17,8 +17,8 @@ const About = () => {
           <div className="relative">
             <div className="relative aspect-[4/5] rounded-lg overflow-hidden">
               <img
-                src={heroCamera}
-                alt="Professional photography equipment"
+                src={heroPhoto1}
+                alt="Professional photographer at sunset"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
