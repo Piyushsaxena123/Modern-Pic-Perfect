@@ -21,7 +21,13 @@ interface ClothingEditorProps {
   onClose: () => void;
 }
 
-type ClothingType = "formal-suit" | "formal-shirt" | "blazer" | "traditional" | "casual-smart" | "school-uniform" | "office-tie";
+type ClothingType = 
+  | "formal-suit" | "formal-shirt" | "blazer" | "traditional" | "casual-smart" 
+  | "school-uniform" | "office-tie"
+  | "school-navy-tie" | "school-red-tie" | "school-green-tie" | "school-maroon-tie"
+  | "school-blazer-navy" | "school-blazer-maroon" | "school-blazer-green"
+  | "school-sweater" | "school-cardigan";
+
 type Gender = "male" | "female";
 
 interface ClothingOption {
@@ -30,16 +36,33 @@ interface ClothingOption {
   description: string;
   icon: any;
   badge?: string;
+  category?: string;
 }
 
 const clothingOptions: ClothingOption[] = [
-  { id: "school-uniform", name: "School Uniform", description: "School uniform with tie & blazer", icon: GraduationCap, badge: "NEW" },
-  { id: "office-tie", name: "Office with Tie", description: "Professional office look with tie", icon: Building2, badge: "NEW" },
-  { id: "formal-suit", name: "Formal Suit", description: "Professional business suit with tie", icon: Briefcase },
-  { id: "formal-shirt", name: "Formal Shirt", description: "Crisp dress shirt for documents", icon: Shirt },
-  { id: "blazer", name: "Smart Blazer", description: "Professional blazer look", icon: Crown },
-  { id: "casual-smart", name: "Smart Casual", description: "Polo or casual button-down", icon: User },
-  { id: "traditional", name: "Traditional", description: "Formal traditional attire", icon: Users },
+  // School Uniform - Tie Colors
+  { id: "school-uniform", name: "School Uniform (Classic)", description: "Standard school uniform with navy tie & blazer", icon: GraduationCap, badge: "POPULAR", category: "school" },
+  { id: "school-navy-tie", name: "Navy Blue Tie", description: "School uniform with navy blue striped tie", icon: GraduationCap, category: "school" },
+  { id: "school-red-tie", name: "Red Tie", description: "School uniform with red/maroon striped tie", icon: GraduationCap, category: "school" },
+  { id: "school-green-tie", name: "Green Tie", description: "School uniform with green striped tie", icon: GraduationCap, category: "school" },
+  { id: "school-maroon-tie", name: "Maroon Tie", description: "School uniform with maroon/burgundy tie", icon: GraduationCap, category: "school" },
+  
+  // School Uniform - Blazer Variations
+  { id: "school-blazer-navy", name: "Navy Blazer", description: "Navy blue school blazer with crest", icon: GraduationCap, category: "school" },
+  { id: "school-blazer-maroon", name: "Maroon Blazer", description: "Maroon school blazer with emblem", icon: GraduationCap, category: "school" },
+  { id: "school-blazer-green", name: "Green Blazer", description: "Bottle green school blazer", icon: GraduationCap, category: "school" },
+  
+  // School Uniform - Other Styles
+  { id: "school-sweater", name: "V-Neck Sweater", description: "School sweater over white shirt with tie", icon: GraduationCap, category: "school" },
+  { id: "school-cardigan", name: "Cardigan Style", description: "School cardigan with formal shirt", icon: GraduationCap, category: "school" },
+  
+  // Office & Formal
+  { id: "office-tie", name: "Office with Tie", description: "Professional office look with tie", icon: Building2, badge: "NEW", category: "office" },
+  { id: "formal-suit", name: "Formal Suit", description: "Professional business suit with tie", icon: Briefcase, category: "office" },
+  { id: "formal-shirt", name: "Formal Shirt", description: "Crisp dress shirt for documents", icon: Shirt, category: "office" },
+  { id: "blazer", name: "Smart Blazer", description: "Professional blazer look", icon: Crown, category: "office" },
+  { id: "casual-smart", name: "Smart Casual", description: "Polo or casual button-down", icon: User, category: "casual" },
+  { id: "traditional", name: "Traditional", description: "Formal traditional attire", icon: Users, category: "traditional" },
 ];
 
 const ClothingEditor = ({ onClose }: ClothingEditorProps) => {
@@ -49,8 +72,13 @@ const ClothingEditor = ({ onClose }: ClothingEditorProps) => {
   const [selectedClothing, setSelectedClothing] = useState<ClothingType>("school-uniform");
   const [gender, setGender] = useState<Gender>("male");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>("school");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const filteredOptions = clothingOptions.filter(opt => 
+    !opt.category || opt.category === categoryFilter || categoryFilter === "all"
+  );
 
   const handleFileUpload = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -253,11 +281,37 @@ const ClothingEditor = ({ onClose }: ClothingEditorProps) => {
             </div>
           </div>
 
+          {/* Category Filter */}
+          <div className="p-4 glass rounded-xl">
+            <label className="text-sm font-medium mb-3 block">Category</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "school", label: "School" },
+                { id: "office", label: "Office" },
+                { id: "casual", label: "Casual" },
+                { id: "traditional", label: "Traditional" },
+                { id: "all", label: "All" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategoryFilter(cat.id)}
+                  className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                    categoryFilter === cat.id
+                      ? "bg-primary text-primary-foreground"
+                      : "glass hover:bg-primary/10"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Clothing options */}
           <div className="p-4 glass rounded-xl">
             <label className="text-sm font-medium mb-3 block">Choose Attire Style</label>
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-2">
-              {clothingOptions.map((option) => (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+              {filteredOptions.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => setSelectedClothing(option.id)}

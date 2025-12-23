@@ -14,6 +14,8 @@ import CompressEditor from "@/components/CompressEditor";
 import ClothingEditor from "@/components/ClothingEditor";
 import FaceEnhanceEditor from "@/components/FaceEnhanceEditor";
 import BackgroundRemover from "@/components/BackgroundRemover";
+import PassportCropper from "@/components/PassportCropper";
+import BatchProcessor from "@/components/BatchProcessor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -30,7 +32,7 @@ const Index = () => {
     setSelectedTool(tool);
   };
 
-  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing", "faceenhance", "bgremove"];
+  const advancedTools = ["filter", "crop", "collage", "converter", "save", "compress", "clothing", "faceenhance", "bgremove", "passport", "batch"];
 
   const getToolTitle = (tool: string) => {
     const titles: Record<string, string> = {
@@ -43,6 +45,8 @@ const Index = () => {
       clothing: "AI Clothing Changer",
       faceenhance: "Face Enhancer",
       bgremove: "Background Remover",
+      passport: "Passport Photo Cropper",
+      batch: "Batch Processor",
     };
     return titles[tool] || tool;
   };
@@ -97,6 +101,8 @@ const Index = () => {
               {selectedTool === "clothing" && <ClothingEditor onClose={() => setSelectedTool(null)} />}
               {selectedTool === "faceenhance" && <FaceEnhanceEditor />}
               {selectedTool === "bgremove" && <BackgroundRemover />}
+              {selectedTool === "passport" && <PassportCropper />}
+              {selectedTool === "batch" && <BatchProcessor />}
             </div>
           </div>
         )}
