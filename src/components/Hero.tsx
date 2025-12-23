@@ -1,7 +1,10 @@
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Play, X } from "lucide-react";
 import heroCamera from "@/assets/hero-camera.png";
 
 const Hero = () => {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <section
       id="home"
@@ -59,12 +62,13 @@ const Hero = () => {
             >
               View Portfolio
             </a>
-            <a
-              href="#contact"
-              className="px-8 py-4 border border-foreground/20 text-foreground font-medium rounded-full hover:border-primary hover:text-primary transition-all duration-300 min-w-[180px]"
+            <button
+              onClick={() => setShowDemo(true)}
+              className="px-8 py-4 border border-foreground/20 text-foreground font-medium rounded-full hover:border-primary hover:text-primary transition-all duration-300 min-w-[180px] flex items-center justify-center gap-2 group"
             >
-              Get in Touch
-            </a>
+              <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              Watch Demo
+            </button>
           </div>
         </div>
 
@@ -81,6 +85,49 @@ const Hero = () => {
       {/* Decorative Elements */}
       <div className="absolute top-1/4 right-10 w-px h-32 bg-gradient-to-b from-transparent via-primary/50 to-transparent hidden lg:block" />
       <div className="absolute bottom-1/4 left-10 w-px h-32 bg-gradient-to-b from-transparent via-primary/50 to-transparent hidden lg:block" />
+
+      {/* Demo Video Modal */}
+      {showDemo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-background/90 backdrop-blur-sm"
+            onClick={() => setShowDemo(false)}
+          />
+          <div className="relative w-full max-w-4xl glass-strong rounded-2xl overflow-hidden animate-scale-in">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="text-xl font-display font-semibold flex items-center gap-2">
+                <Play className="w-5 h-5 text-primary" />
+                Watch Demo
+              </h3>
+              <button 
+                onClick={() => setShowDemo(false)}
+                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Video Content */}
+            <div className="aspect-video bg-secondary/50">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0"
+                title="PicPerfect Demo Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-border">
+              <p className="text-sm text-muted-foreground text-center">
+                Learn how to use PicPerfect's powerful editing tools to transform your photos
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
