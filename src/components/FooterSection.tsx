@@ -58,7 +58,7 @@ const FooterSection = () => {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary" />
-                <span>San Francisco, CA</span>
+                <span>India</span>
               </li>
             </ul>
           </div>
