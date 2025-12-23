@@ -1,11 +1,29 @@
+import { useState, useEffect } from "react";
 import { ArrowRight, Play } from "lucide-react";
-import heroCamera from "@/assets/hero-camera.png";
+import heroPhoto1 from "@/assets/hero-photo-1.jpg";
+import heroPhoto2 from "@/assets/hero-photo-2.jpg";
+import heroPhoto3 from "@/assets/hero-photo-3.jpg";
+
+const heroImages = [
+  { src: heroPhoto1, alt: "Photographer capturing sunset moments" },
+  { src: heroPhoto2, alt: "Creative photo editing workspace" },
+  { src: heroPhoto3, alt: "Stunning mountain landscape photography" },
+];
 
 interface HeroSectionProps {
   onGetStarted: () => void;
 }
 
 const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background Effects */}
@@ -78,22 +96,50 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             </div>
           </div>
 
-          {/* Hero Image/Visual */}
+          {/* Hero Image/Visual with Carousel */}
           <div className="relative opacity-0 animate-scale-in" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-square max-w-lg mx-auto">
               {/* Glow effect */}
               <div className="absolute inset-0 rounded-3xl gradient-bg opacity-20 blur-3xl animate-pulse-glow" />
               
-              {/* Main image container */}
+              {/* Main image container with carousel */}
               <div className="relative rounded-3xl overflow-hidden glass p-2">
+                {heroImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image.src}
+                    alt={image.alt}
+                    className={`absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover rounded-2xl transition-opacity duration-1000 ${
+                      index === currentImage ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                ))}
+                {/* Static placeholder for sizing */}
                 <img
-                  src={heroCamera}
-                  alt="Professional Camera"
-                  className="w-full h-full object-cover rounded-2xl"
+                  src={heroImages[0].src}
+                  alt=""
+                  className="w-full h-full object-cover rounded-2xl opacity-0"
+                  aria-hidden="true"
                 />
                 
+                {/* Image indicators */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImage(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentImage
+                          ? "bg-primary w-6"
+                          : "bg-foreground/30 hover:bg-foreground/50"
+                      }`}
+                      aria-label={`Go to image ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                
                 {/* Floating cards */}
-                <div className="absolute -top-4 -right-4 glass rounded-xl p-3 animate-float">
+                <div className="absolute -top-4 -right-4 glass rounded-xl p-3 animate-float z-20">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
                       <span className="text-white text-xs font-bold">AI</span>
@@ -105,7 +151,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                   </div>
                 </div>
 
-                <div className="absolute -bottom-4 -left-4 glass rounded-xl p-3 animate-float" style={{ animationDelay: "-2s" }}>
+                <div className="absolute -bottom-4 -left-4 glass rounded-xl p-3 animate-float z-20" style={{ animationDelay: "-2s" }}>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
                       <span className="text-accent-foreground text-xs font-bold">HD</span>
