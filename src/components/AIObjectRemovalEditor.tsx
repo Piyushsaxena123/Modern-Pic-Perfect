@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { X, Upload, Loader2, Download, Sparkles, Eraser, Undo2 } from "lucide-react";
+import { Upload, Loader2, Download, Sparkles, Eraser, Undo2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import BeforeAfterSlider from "./BeforeAfterSlider";
