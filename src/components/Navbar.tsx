@@ -57,25 +57,12 @@ const Navbar = ({ activeSection, onNavigate }: NavbarProps) => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <User className="w-4 h-4" />
-                    {user.email?.split("@")[0]}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={signOut} className="cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button variant="outline" onClick={signOut} className="gap-2">
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
             ) : (
-              <>
-                <button onClick={() => navigate("/auth")} className="btn-secondary text-sm">Sign In</button>
-                <button onClick={() => navigate("/auth")} className="btn-primary text-sm">Get Started</button>
-              </>
+              <button onClick={() => navigate("/auth")} className="btn-secondary text-sm">Sign In</button>
             )}
           </div>
 
@@ -102,12 +89,12 @@ const Navbar = ({ activeSection, onNavigate }: NavbarProps) => {
               ))}
               <div className="flex gap-3 mt-4">
                 {user ? (
-                  <button onClick={signOut} className="btn-secondary flex-1 text-sm">Sign Out</button>
+                  <button onClick={signOut} className="btn-secondary flex-1 text-sm flex items-center justify-center gap-2">
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
                 ) : (
-                  <>
-                    <button onClick={() => navigate("/auth")} className="btn-secondary flex-1 text-sm">Sign In</button>
-                    <button onClick={() => navigate("/auth")} className="btn-primary flex-1 text-sm">Get Started</button>
-                  </>
+                  <button onClick={() => navigate("/auth")} className="btn-secondary flex-1 text-sm">Sign In</button>
                 )}
               </div>
             </div>
