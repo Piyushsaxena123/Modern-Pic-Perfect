@@ -13,6 +13,7 @@ import {
   Lock,
   Unlock,
   Check,
+  Star,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -41,6 +42,9 @@ const ToolModal = ({ tool, onClose }: ToolModalProps) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
   const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackName, setFeedbackName] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackRating, setFeedbackRating] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Resize state
@@ -105,10 +109,15 @@ const ToolModal = ({ tool, onClose }: ToolModalProps) => {
   }, [toast]);
 
   const handleFeedbackSubmit = () => {
-    if (feedbackText.trim()) {
-      toast({ title: "Thank you!", description: "Your feedback has been submitted." });
+    if (feedbackText.trim() && feedbackName.trim() && feedbackEmail.trim() && feedbackRating > 0) {
+      toast({ title: "Thank you!", description: "Your feedback has been submitted successfully." });
       setFeedbackText("");
+      setFeedbackName("");
+      setFeedbackEmail("");
+      setFeedbackRating(0);
       onClose();
+    } else {
+      toast({ title: "Please fill all fields", description: "Name, email, rating, and feedback are required.", variant: "destructive" });
     }
   };
 
@@ -214,12 +223,62 @@ const ToolModal = ({ tool, onClose }: ToolModalProps) => {
           <p className="text-muted-foreground">
             Help us improve PicPerfect by sharing your thoughts, suggestions, or reporting issues.
           </p>
-          <textarea
-            value={feedbackText}
-            onChange={(e) => setFeedbackText(e.target.value)}
-            placeholder="Tell us what you think..."
-            className="input-field min-h-[150px] resize-none"
-          />
+          
+          {/* Name Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Name</label>
+            <input
+              type="text"
+              value={feedbackName}
+              onChange={(e) => setFeedbackName(e.target.value)}
+              placeholder="Your name"
+              className="input-field w-full"
+            />
+          </div>
+          
+          {/* Email Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Email</label>
+            <input
+              type="email"
+              value={feedbackEmail}
+              onChange={(e) => setFeedbackEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="input-field w-full"
+            />
+          </div>
+          
+          {/* Star Rating */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Rating</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setFeedbackRating(star)}
+                  className={`p-2 rounded-lg transition-all ${
+                    star <= feedbackRating 
+                      ? "text-yellow-500 scale-110" 
+                      : "text-muted-foreground hover:text-yellow-400"
+                  }`}
+                >
+                  <Star className={`w-6 h-6 ${star <= feedbackRating ? "fill-current" : ""}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Feedback Text */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Your Feedback</label>
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Tell us what you think..."
+              className="input-field min-h-[120px] resize-none w-full"
+            />
+          </div>
+          
           <button onClick={handleFeedbackSubmit} className="btn-primary w-full">
             Submit Feedback
           </button>
