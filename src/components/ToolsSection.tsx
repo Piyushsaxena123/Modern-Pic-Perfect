@@ -131,7 +131,7 @@ const tools = [
 
 const ToolsSection = ({ onToolSelect }: ToolsSectionProps) => {
   return (
-    <section id="tools" className="relative py-24 overflow-hidden">
+    <section id="tools" className="relative py-12 overflow-hidden -mt-20">
       {/* Enhanced Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/10 rounded-full blur-[150px]" />
