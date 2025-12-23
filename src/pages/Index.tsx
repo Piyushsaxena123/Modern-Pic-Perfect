@@ -5,6 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import ToolsSection from "@/components/ToolsSection";
 import FooterSection from "@/components/FooterSection";
 import ToolModal from "@/components/ToolModal";
+import FilterEditor from "@/components/FilterEditor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -45,8 +46,13 @@ const Index = () => {
 
         <FooterSection />
 
-        {/* Tool Modal */}
-        {selectedTool && (
+        {/* Filter Editor (Advanced) */}
+        {selectedTool === "filter" && (
+          <FilterEditor onClose={() => setSelectedTool(null)} />
+        )}
+
+        {/* Other Tool Modals */}
+        {selectedTool && selectedTool !== "filter" && (
           <ToolModal tool={selectedTool} onClose={() => setSelectedTool(null)} />
         )}
       </div>
