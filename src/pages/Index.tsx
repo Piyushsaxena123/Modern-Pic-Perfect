@@ -8,6 +8,8 @@ import ToolModal from "@/components/ToolModal";
 import FilterEditor from "@/components/FilterEditor";
 import CropEditor from "@/components/CropEditor";
 import CollageEditor from "@/components/CollageEditor";
+import ConverterEditor from "@/components/ConverterEditor";
+import SaveEditor from "@/components/SaveEditor";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -23,6 +25,8 @@ const Index = () => {
   const handleToolSelect = (tool: string) => {
     setSelectedTool(tool);
   };
+
+  const advancedTools = ["filter", "crop", "collage", "converter", "save"];
 
   return (
     <>
@@ -63,8 +67,18 @@ const Index = () => {
           <CollageEditor onClose={() => setSelectedTool(null)} />
         )}
 
-        {/* Other Tool Modals */}
-        {selectedTool && !["filter", "crop", "collage"].includes(selectedTool) && (
+        {/* Converter Editor */}
+        {selectedTool === "converter" && (
+          <ConverterEditor onClose={() => setSelectedTool(null)} />
+        )}
+
+        {/* Save Editor */}
+        {selectedTool === "save" && (
+          <SaveEditor onClose={() => setSelectedTool(null)} />
+        )}
+
+        {/* Other Tool Modals (resize, feedback) */}
+        {selectedTool && !advancedTools.includes(selectedTool) && (
           <ToolModal tool={selectedTool} onClose={() => setSelectedTool(null)} />
         )}
       </div>
