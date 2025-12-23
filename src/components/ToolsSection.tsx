@@ -13,6 +13,8 @@ import {
   Zap,
   ImageOff,
   Smile,
+  Camera,
+  Layers,
 } from "lucide-react";
 
 interface ToolsSectionProps {
@@ -61,12 +63,28 @@ const tools = [
     badge: "PRO",
   },
   {
+    id: "passport",
+    icon: Camera,
+    title: "Passport Photo",
+    description: "Create passport photos with standard sizes (2×2 inch, 35×45mm) & auto-centering.",
+    color: "from-green-500 to-emerald-600",
+    badge: "NEW",
+  },
+  {
+    id: "batch",
+    icon: Layers,
+    title: "Batch Processor",
+    description: "Process multiple images at once for clothing change or background removal.",
+    color: "from-purple-500 to-indigo-600",
+    badge: "NEW",
+  },
+  {
     id: "compress",
     icon: Minimize2,
     title: "Image Compressor",
     description: "Reduce file size up to 80% while maintaining quality. See live preview.",
     color: "from-amber-500 to-orange-600",
-    badge: "NEW",
+    badge: null,
   },
   {
     id: "crop",
