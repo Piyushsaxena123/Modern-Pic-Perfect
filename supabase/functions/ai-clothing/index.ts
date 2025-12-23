@@ -26,7 +26,21 @@ serve(async (req) => {
     // Build the prompt for clothing change
     let prompt = `Edit this person's photo to change their clothing. `;
     
-    if (clothingType === "formal-suit") {
+    if (clothingType === "school-uniform") {
+      prompt += `Replace their current outfit with a school uniform. `;
+      if (gender === "male") {
+        prompt += `Add a neat white formal shirt with a school tie (navy blue or maroon striped), dark navy blue or black formal pants, and optionally a school blazer. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
+      } else {
+        prompt += `Add a neat white formal shirt or blouse with a school tie (navy blue or maroon striped), and a formal school pinafore or skirt. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
+      }
+    } else if (clothingType === "office-tie") {
+      prompt += `Replace their current outfit with professional office attire with a tie. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white or light blue formal dress shirt with a professional necktie (solid color or subtle pattern), and ensure the collar is neat and the tie is properly knotted. This should look like a professional office worker ready for an important meeting.`;
+      } else {
+        prompt += `Add a professional blouse with a feminine necktie or bow tie, or a formal blazer with a professional look. The outfit should be suitable for a corporate office environment.`;
+      }
+    } else if (clothingType === "formal-suit") {
       prompt += `Replace their current outfit with a professional formal business suit. `;
       if (gender === "male") {
         prompt += `Add a navy blue or charcoal grey formal suit with a white dress shirt, a professional tie, and make sure the person looks professional and ready for a formal occasion or government document photo.`;

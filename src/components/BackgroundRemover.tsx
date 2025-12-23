@@ -1,13 +1,30 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, Loader2, ImageOff, Sparkles } from "lucide-react";
+import { Upload, Download, Loader2, ImageOff, Sparkles, Palette, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+type BackgroundType = "transparent" | "color" | "custom";
+
+const colorOptions = [
+  { id: "white", color: "#FFFFFF", name: "White" },
+  { id: "lightblue", color: "#E3F2FD", name: "Light Blue" },
+  { id: "lightgray", color: "#F5F5F5", name: "Light Gray" },
+  { id: "blue", color: "#1976D2", name: "Blue" },
+  { id: "red", color: "#D32F2F", name: "Red" },
+  { id: "green", color: "#388E3C", name: "Green" },
+  { id: "navy", color: "#1A237E", name: "Navy" },
+  { id: "maroon", color: "#7B1FA2", name: "Maroon" },
+];
 
 const BackgroundRemover = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [backgroundType, setBackgroundType] = useState<BackgroundType>("transparent");
+  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const [customBackground, setCustomBackground] = useState<string | null>(null);
+  const customBgInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,118 +43,72 @@ const BackgroundRemover = () => {
     }
   }, [toast]);
 
+  const handleCustomBgUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setCustomBackground(event.target?.result as string);
+        setBackgroundType("custom");
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   const removeBackground = useCallback(async () => {
     if (!originalImage) return;
 
     setProcessing(true);
-    setProgress(10);
 
     try {
-      // Dynamic import for better performance
-      const { pipeline, env } = await import("@huggingface/transformers");
+      // Build prompt based on background type
+      let prompt = "Remove the background from this image completely. ";
       
-      // Configure transformers.js
-      env.allowLocalModels = false;
-      env.useBrowserCache = true;
+      if (backgroundType === "transparent") {
+        prompt += "Make the background fully transparent, keeping only the main subject (person or object) in the image. The result should be suitable for a passport photo or product image with no background.";
+      } else if (backgroundType === "color") {
+        prompt += `Replace the background with a solid ${selectedColor === "#FFFFFF" ? "white" : selectedColor === "#E3F2FD" ? "light blue" : selectedColor === "#1976D2" ? "blue" : selectedColor === "#D32F2F" ? "red" : selectedColor === "#388E3C" ? "green" : selectedColor === "#1A237E" ? "navy blue" : "colored"} background. Keep only the main subject and replace everything else with this solid color background. Make it look professional, suitable for official documents.`;
+      } else if (backgroundType === "custom" && customBackground) {
+        prompt += "Remove the background and prepare the subject for compositing onto a new background.";
+      }
 
-      setProgress(30);
-      toast({ title: "Loading AI model", description: "This may take a moment on first use..." });
-
-      // Load the image
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = reject;
-        img.src = originalImage;
+      const { data, error } = await supabase.functions.invoke("ai-background", {
+        body: {
+          imageBase64: originalImage,
+          backgroundType,
+          backgroundColor: selectedColor,
+          customBackground: backgroundType === "custom" ? customBackground : null,
+          prompt
+        }
       });
 
-      setProgress(50);
+      if (error) throw error;
 
-      // Create canvas and resize if needed
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Could not get canvas context");
-
-      const MAX_DIM = 1024;
-      let width = img.naturalWidth;
-      let height = img.naturalHeight;
-
-      if (width > MAX_DIM || height > MAX_DIM) {
-        if (width > height) {
-          height = Math.round((height * MAX_DIM) / width);
-          width = MAX_DIM;
-        } else {
-          width = Math.round((width * MAX_DIM) / height);
-          height = MAX_DIM;
-        }
+      if (data.error) {
+        toast({ title: "Error", description: data.error, variant: "destructive" });
+        return;
       }
 
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const imageData = canvas.toDataURL("image/jpeg", 0.8);
-
-      setProgress(60);
-
-      // Use segmentation model
-      const segmenter = await pipeline(
-        "image-segmentation",
-        "Xenova/segformer-b0-finetuned-ade-512-512",
-        { device: "webgpu" }
-      );
-
-      setProgress(80);
-
-      const result = await segmenter(imageData);
-
-      if (!result || !Array.isArray(result) || result.length === 0 || !result[0].mask) {
-        throw new Error("Invalid segmentation result");
+      if (data.image) {
+        setProcessedImage(data.image);
+        toast({ title: "Success!", description: "Background processed successfully." });
       }
-
-      // Create output canvas
-      const outputCanvas = document.createElement("canvas");
-      outputCanvas.width = width;
-      outputCanvas.height = height;
-      const outputCtx = outputCanvas.getContext("2d");
-      if (!outputCtx) throw new Error("Could not get output canvas context");
-
-      outputCtx.drawImage(canvas, 0, 0);
-
-      const outputImageData = outputCtx.getImageData(0, 0, width, height);
-      const data = outputImageData.data;
-
-      // Apply inverted mask to alpha channel
-      for (let i = 0; i < result[0].mask.data.length; i++) {
-        const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
-        data[i * 4 + 3] = alpha;
-      }
-
-      outputCtx.putImageData(outputImageData, 0, 0);
-      setProgress(100);
-
-      const resultUrl = outputCanvas.toDataURL("image/png");
-      setProcessedImage(resultUrl);
-      toast({ title: "Success!", description: "Background removed successfully." });
     } catch (error: any) {
       console.error("Background removal error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to remove background. Try a different image.",
+        description: error.message || "Failed to process background. Try again.",
         variant: "destructive",
       });
     } finally {
       setProcessing(false);
-      setProgress(0);
     }
-  }, [originalImage, toast]);
+  }, [originalImage, backgroundType, selectedColor, customBackground, toast]);
 
   const handleDownload = useCallback(() => {
     if (!processedImage) return;
     const link = document.createElement("a");
-    link.download = "no-background.png";
+    link.download = "edited-background.png";
     link.href = processedImage;
     link.click();
   }, [processedImage]);
@@ -154,84 +125,177 @@ const BackgroundRemover = () => {
         </label>
       ) : (
         <div className="space-y-6">
-          {/* Image Comparison */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Original */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-center">Original</h3>
-              <div className="relative rounded-xl overflow-hidden bg-secondary/50 border border-border aspect-square flex items-center justify-center">
-                <img
-                  src={originalImage}
-                  alt="Original"
-                  className="max-w-full max-h-full object-contain"
-                />
-              </div>
-            </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Left - Image Preview */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Original */}
+                <div className="space-y-2">
+                  <h3 className="font-medium text-center text-sm">Original</h3>
+                  <div className="relative rounded-xl overflow-hidden bg-secondary/50 border border-border aspect-square flex items-center justify-center">
+                    <img src={originalImage} alt="Original" className="max-w-full max-h-full object-contain" />
+                  </div>
+                </div>
 
-            {/* Result */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-center">Result</h3>
-              <div 
-                className="relative rounded-xl overflow-hidden border border-border aspect-square flex items-center justify-center"
-                style={{
-                  backgroundImage: `repeating-conic-gradient(hsl(var(--muted)) 0% 25%, transparent 0% 50%)`,
-                  backgroundSize: "20px 20px",
-                  backgroundPosition: "0 0, 10px 10px",
-                }}
-              >
-                {processedImage ? (
-                  <img
-                    src={processedImage}
-                    alt="Result"
-                    className="max-w-full max-h-full object-contain"
-                  />
-                ) : (
-                  <div className="text-muted-foreground text-center p-4">
-                    {processing ? (
-                      <div className="space-y-3">
-                        <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-                        <p>Processing... {progress}%</p>
-                      </div>
+                {/* Result */}
+                <div className="space-y-2">
+                  <h3 className="font-medium text-center text-sm">Result</h3>
+                  <div 
+                    className="relative rounded-xl overflow-hidden border border-border aspect-square flex items-center justify-center"
+                    style={{
+                      background: backgroundType === "transparent" 
+                        ? `repeating-conic-gradient(hsl(var(--muted)) 0% 25%, transparent 0% 50%)`
+                        : backgroundType === "color" 
+                        ? selectedColor
+                        : customBackground 
+                        ? `url(${customBackground}) center/cover`
+                        : `repeating-conic-gradient(hsl(var(--muted)) 0% 25%, transparent 0% 50%)`,
+                      backgroundSize: backgroundType === "transparent" ? "20px 20px" : undefined,
+                    }}
+                  >
+                    {processedImage ? (
+                      <img src={processedImage} alt="Result" className="max-w-full max-h-full object-contain" />
                     ) : (
-                      <p>Result will appear here</p>
+                      <div className="text-muted-foreground text-center p-4">
+                        {processing ? (
+                          <div className="space-y-3">
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto" />
+                            <p className="text-sm">Processing with AI...</p>
+                          </div>
+                        ) : (
+                          <p className="text-sm">Result will appear here</p>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-3">
+                <label className="flex-1">
+                  <Button variant="outline" className="w-full" asChild>
+                    <span><Upload className="w-4 h-4 mr-2" />Change Image</span>
+                  </Button>
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                </label>
+                <Button onClick={handleDownload} disabled={!processedImage} variant="outline" className="flex-1">
+                  <Download className="w-4 h-4 mr-2" />Download
+                </Button>
               </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            <label>
-              <Button variant="outline" asChild>
-                <span><Upload className="w-4 h-4 mr-2" />Change Image</span>
+            {/* Right - Controls */}
+            <div className="space-y-6">
+              {/* Background Type */}
+              <div className="glass rounded-xl p-5 space-y-4">
+                <h3 className="font-display font-semibold flex items-center gap-2">
+                  <Palette className="w-5 h-5 text-primary" />
+                  Background Options
+                </h3>
+
+                <div className="space-y-3">
+                  {/* Transparent */}
+                  <button
+                    onClick={() => setBackgroundType("transparent")}
+                    className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
+                      backgroundType === "transparent" ? "bg-primary text-primary-foreground" : "glass hover:bg-primary/10"
+                    }`}
+                  >
+                    <div 
+                      className="w-10 h-10 rounded-lg border-2 border-dashed"
+                      style={{
+                        background: `repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%)`,
+                        backgroundSize: "10px 10px",
+                      }}
+                    />
+                    <div className="text-left flex-1">
+                      <p className="font-medium">Transparent</p>
+                      <p className="text-xs opacity-80">Remove background completely</p>
+                    </div>
+                  </button>
+
+                  {/* Color Background */}
+                  <button
+                    onClick={() => setBackgroundType("color")}
+                    className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
+                      backgroundType === "color" ? "bg-primary text-primary-foreground" : "glass hover:bg-primary/10"
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: selectedColor, border: "2px solid rgba(255,255,255,0.3)" }} />
+                    <div className="text-left flex-1">
+                      <p className="font-medium">Solid Color</p>
+                      <p className="text-xs opacity-80">Replace with a color background</p>
+                    </div>
+                  </button>
+
+                  {/* Color Picker */}
+                  {backgroundType === "color" && (
+                    <div className="grid grid-cols-4 gap-2 p-3 glass rounded-xl">
+                      {colorOptions.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => setSelectedColor(c.color)}
+                          className={`aspect-square rounded-lg transition-all ${
+                            selectedColor === c.color ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110" : "hover:scale-105"
+                          }`}
+                          style={{ backgroundColor: c.color, border: "1px solid rgba(0,0,0,0.1)" }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Custom Background */}
+                  <button
+                    onClick={() => customBgInputRef.current?.click()}
+                    className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
+                      backgroundType === "custom" ? "bg-primary text-primary-foreground" : "glass hover:bg-primary/10"
+                    }`}
+                  >
+                    {customBackground ? (
+                      <div className="w-10 h-10 rounded-lg overflow-hidden">
+                        <img src={customBackground} alt="Custom" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                        <ImageIcon className="w-5 h-5" />
+                      </div>
+                    )}
+                    <div className="text-left flex-1">
+                      <p className="font-medium">Custom Background</p>
+                      <p className="text-xs opacity-80">Upload your own background image</p>
+                    </div>
+                  </button>
+                  <input
+                    ref={customBgInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCustomBgUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Process Button */}
+              <Button onClick={removeBackground} disabled={processing} className="w-full h-14 text-lg btn-primary">
+                {processing ? (
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Processing...</>
+                ) : (
+                  <><Sparkles className="w-5 h-5 mr-2" />Remove & Replace Background</>
+                )}
               </Button>
-              <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-            </label>
-            
-            <Button onClick={removeBackground} disabled={processing} className="btn-primary">
-              {processing ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 mr-2" />
-              )}
-              Remove Background
-            </Button>
 
-            <Button onClick={handleDownload} disabled={!processedImage} variant="outline">
-              <Download className="w-4 h-4 mr-2" />Download PNG
-            </Button>
-          </div>
-
-          {/* Tips */}
-          <div className="glass rounded-xl p-4 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground mb-2">Tips for best results:</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Use clear, high-contrast images</li>
-              <li>Works best with portraits and product photos</li>
-              <li>First use may take longer as the AI model loads</li>
-            </ul>
+              {/* Tips */}
+              <div className="glass rounded-xl p-4 text-sm text-muted-foreground">
+                <p className="font-medium text-foreground mb-2">Tips for best results:</p>
+                <ul className="list-disc list-inside space-y-1 text-xs">
+                  <li>Use clear, high-contrast images</li>
+                  <li>Works best with portraits and product photos</li>
+                  <li>White/solid color backgrounds give best results for passport photos</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       )}
