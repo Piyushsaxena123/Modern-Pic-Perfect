@@ -1,24 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Play, X } from "lucide-react";
-import heroCamera from "@/assets/hero-camera.png";
+import heroPhoto1 from "@/assets/hero-photo-1.jpg";
+import heroPhoto2 from "@/assets/hero-photo-2.jpg";
+import heroPhoto3 from "@/assets/hero-photo-3.jpg";
+
+const heroImages = [
+  { src: heroPhoto1, alt: "Photographer capturing sunset moments" },
+  { src: heroPhoto2, alt: "Creative photo editing workspace" },
+  { src: heroPhoto3, alt: "Stunning mountain landscape photography" },
+];
 
 const Hero = () => {
   const [showDemo, setShowDemo] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background Image */}
+      {/* Background Images Carousel */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={heroCamera}
-          alt="Professional DSLR Camera"
-          className="w-full h-full object-cover object-center opacity-40"
-        />
+        {heroImages.map((image, index) => (
+          <img
+            key={index}
+            src={image.src}
+            alt={image.alt}
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
+              index === currentImage ? "opacity-50" : "opacity-0"
+            }`}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background/50" />
+      </div>
+
+      {/* Image Indicators */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {heroImages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImage(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentImage
+                ? "bg-primary w-8"
+                : "bg-foreground/30 hover:bg-foreground/50"
+            }`}
+            aria-label={`Go to image ${index + 1}`}
+          />
+        ))}
       </div>
 
       {/* Content */}
