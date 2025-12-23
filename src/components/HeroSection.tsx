@@ -66,15 +66,10 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
               Professional-grade image editing tools. Create stunning collages, apply filters, resize, crop, and convert your images effortlessly.
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start opacity-0 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
               <button onClick={onGetStarted} className="btn-primary flex items-center justify-center gap-2 group">
                 Start Editing Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button onClick={() => setShowDemo(true)} className="btn-secondary flex items-center justify-center gap-2">
-                <Play className="w-4 h-4" />
-                Watch Demo
               </button>
             </div>
 
