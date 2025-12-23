@@ -1,48 +1,54 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import AppSidebar from "@/components/AppSidebar";
-import TopBar from "@/components/TopBar";
-import MainContent from "@/components/MainContent";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import ToolsSection from "@/components/ToolsSection";
+import FooterSection from "@/components/FooterSection";
+import ToolModal from "@/components/ToolModal";
 
 const Index = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState("collage");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSection, setActiveSection] = useState("home");
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
 
-  const handleItemClick = (item: string) => {
-    setActiveItem(item);
-    setSidebarOpen(false);
+  const handleNavigate = (section: string) => {
+    setActiveSection(section);
+    if (section === "tools") {
+      document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleToolSelect = (tool: string) => {
+    setSelectedTool(tool);
   };
 
   return (
     <>
       <Helmet>
-        <title>Pic Perfect | Image Editing Tools</title>
+        <title>PicPerfect | Professional Image Editing Tools</title>
         <meta
           name="description"
-          content="Professional image editing tools - Create collages, apply filters, resize, crop, and convert your images with ease."
+          content="Transform your images with PicPerfect. Professional-grade tools for collage, filters, resize, crop, and format conversion. Free online image editor."
         />
         <meta
           name="keywords"
-          content="image editor, collage maker, photo filter, resize images, crop photos, image converter"
+          content="image editor, photo editor, collage maker, image filter, resize image, crop image, image converter, online editor"
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background text-foreground overflow-hidden">
-        <AppSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          activeItem={activeItem}
-          onItemClick={handleItemClick}
-        />
+      <div className="min-h-screen bg-background text-foreground">
+        <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
+        
+        <main>
+          <HeroSection onGetStarted={() => handleNavigate("tools")} />
+          <ToolsSection onToolSelect={handleToolSelect} />
+        </main>
 
-        <TopBar
-          onMenuClick={() => setSidebarOpen(true)}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+        <FooterSection />
 
-        <MainContent activeItem={activeItem} />
+        {/* Tool Modal */}
+        {selectedTool && (
+          <ToolModal tool={selectedTool} onClose={() => setSelectedTool(null)} />
+        )}
       </div>
     </>
   );
