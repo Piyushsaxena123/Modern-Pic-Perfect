@@ -26,12 +26,76 @@ serve(async (req) => {
     // Build the prompt for clothing change
     let prompt = `Edit this person's photo to change their clothing. `;
     
+    // School Uniform Variations
     if (clothingType === "school-uniform") {
       prompt += `Replace their current outfit with a school uniform. `;
       if (gender === "male") {
-        prompt += `Add a neat white formal shirt with a school tie (navy blue or maroon striped), dark navy blue or black formal pants, and optionally a school blazer. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
+        prompt += `Add a neat white formal shirt with a school tie (navy blue or maroon striped), dark navy blue or black formal pants, and a school blazer. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
       } else {
-        prompt += `Add a neat white formal shirt or blouse with a school tie (navy blue or maroon striped), and a formal school pinafore or skirt. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
+        prompt += `Add a neat white formal shirt or blouse with a school tie (navy blue or maroon striped), and a formal school pinafore or skirt with blazer. The uniform should look like a typical formal school uniform suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-navy-tie") {
+      prompt += `Replace their current outfit with a school uniform with a NAVY BLUE striped tie. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a navy blue striped school tie, dark formal pants, and optionally a navy blazer. The uniform should look neat and formal for school ID photos.`;
+      } else {
+        prompt += `Add a crisp white blouse with a navy blue striped school tie, formal skirt or pinafore, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-red-tie") {
+      prompt += `Replace their current outfit with a school uniform with a RED/MAROON striped tie. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a red or maroon striped school tie, dark formal pants. The uniform should look neat and formal for school ID photos.`;
+      } else {
+        prompt += `Add a crisp white blouse with a red or maroon striped school tie, formal skirt or pinafore, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-green-tie") {
+      prompt += `Replace their current outfit with a school uniform with a GREEN striped tie. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a bottle green striped school tie, dark formal pants. The uniform should look neat and formal for school ID photos.`;
+      } else {
+        prompt += `Add a crisp white blouse with a bottle green striped school tie, formal skirt or pinafore, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-maroon-tie") {
+      prompt += `Replace their current outfit with a school uniform with a MAROON/BURGUNDY tie. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a maroon or burgundy striped school tie, dark formal pants. The uniform should look neat and formal for school ID photos.`;
+      } else {
+        prompt += `Add a crisp white blouse with a maroon or burgundy striped school tie, formal skirt or pinafore, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-blazer-navy") {
+      prompt += `Replace their current outfit with a school uniform with a NAVY BLUE BLAZER. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a tie, dark formal pants, and a navy blue school blazer with a school crest/emblem. The uniform should look prestigious and formal.`;
+      } else {
+        prompt += `Add a crisp white blouse with a tie, formal skirt, and a navy blue school blazer with emblem, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-blazer-maroon") {
+      prompt += `Replace their current outfit with a school uniform with a MAROON BLAZER. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a tie, dark formal pants, and a maroon/burgundy school blazer with a school crest. The uniform should look prestigious and formal.`;
+      } else {
+        prompt += `Add a crisp white blouse with a tie, formal skirt, and a maroon school blazer with emblem, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-blazer-green") {
+      prompt += `Replace their current outfit with a school uniform with a BOTTLE GREEN BLAZER. `;
+      if (gender === "male") {
+        prompt += `Add a crisp white formal shirt with a tie, dark formal pants, and a bottle green school blazer with a school crest. The uniform should look prestigious and formal.`;
+      } else {
+        prompt += `Add a crisp white blouse with a tie, formal skirt, and a bottle green school blazer with emblem, suitable for school ID photos.`;
+      }
+    } else if (clothingType === "school-sweater") {
+      prompt += `Replace their current outfit with a school uniform featuring a V-NECK SWEATER. `;
+      if (gender === "male") {
+        prompt += `Add a white formal shirt with a tie visible at the collar, a navy or maroon V-neck school sweater over it, and formal pants. The look should be neat and suitable for cooler weather school photos.`;
+      } else {
+        prompt += `Add a white blouse with a tie visible at the collar, a navy or maroon V-neck school sweater over it, and formal skirt. The look should be neat and suitable for school photos.`;
+      }
+    } else if (clothingType === "school-cardigan") {
+      prompt += `Replace their current outfit with a school uniform featuring a CARDIGAN. `;
+      if (gender === "male") {
+        prompt += `Add a white formal shirt with a tie, a dark colored school cardigan, and formal pants. The look should be smart and academic.`;
+      } else {
+        prompt += `Add a white blouse with a tie, a dark colored school cardigan, and formal skirt. The look should be smart and suitable for school photos.`;
       }
     } else if (clothingType === "office-tie") {
       prompt += `Replace their current outfit with professional office attire with a tie. `;
@@ -71,6 +135,9 @@ serve(async (req) => {
     } else if (clothingType === "casual-smart") {
       prompt += `Change their outfit to smart casual wear. `;
       prompt += `Add a polo shirt or casual button-down shirt that looks neat and presentable.`;
+    } else {
+      // Fallback for any unrecognized type - default to formal shirt
+      prompt += `Replace their current outfit with a formal white dress shirt with a professional tie, suitable for official document photos.`;
     }
 
     prompt += ` Keep the person's face, hair, and expression exactly the same. Only change the clothing. The photo should look natural and realistic, suitable for official documents or professional use.`;
