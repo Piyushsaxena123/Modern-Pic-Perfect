@@ -8,8 +8,11 @@ import {
   FileText,
   Check,
   Loader2,
-  File,
   FolderDown,
+  Share2,
+  Twitter,
+  Linkedin,
+  Facebook,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
@@ -41,6 +44,7 @@ const SaveEditor = ({ onClose }: SaveEditorProps) => {
   const [selectedFormat, setSelectedFormat] = useState<SaveFormat>("original");
   const [quality, setQuality] = useState(92);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showShareSection, setShowShareSection] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -169,9 +173,10 @@ const SaveEditor = ({ onClose }: SaveEditorProps) => {
         downloadBlob(blob, newName);
       }
       
+      setShowShareSection(true);
       toast({ 
         title: "Files saved!", 
-        description: `${uploadedFiles.length} file(s) downloaded successfully.` 
+        description: `${uploadedFiles.length} file(s) downloaded. Share them on social media!` 
       });
     } catch (error) {
       console.error(error);
@@ -344,6 +349,51 @@ const SaveEditor = ({ onClose }: SaveEditorProps) => {
                 </>
               )}
             </button>
+          )}
+
+          {/* Share Section */}
+          {showShareSection && (
+            <div className="p-6 glass rounded-xl mt-6 animate-fade-in">
+              <h5 className="text-sm font-medium mb-4 flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-primary" />
+                Share Your Images
+              </h5>
+              <p className="text-xs text-muted-foreground mb-4">
+                Your images have been downloaded. Click below to share them on social media:
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20my%20edited%20image%20created%20with%20PicPerfect!"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 text-[#1DA1F2] transition-colors"
+                >
+                  <Twitter className="w-4 h-4" />
+                  <span className="text-sm font-medium">Twitter</span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://picperfect.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 text-[#0A66C2] transition-colors"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  <span className="text-sm font-medium">LinkedIn</span>
+                </a>
+                <a
+                  href="https://www.facebook.com/sharer/sharer.php?quote=Check%20out%20my%20edited%20image%20created%20with%20PicPerfect!"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 text-[#1877F2] transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                  <span className="text-sm font-medium">Facebook</span>
+                </a>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                After clicking, attach your downloaded image to complete the post.
+              </p>
+            </div>
           )}
 
           {/* Tips */}
