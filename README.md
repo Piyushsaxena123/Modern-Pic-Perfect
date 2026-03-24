@@ -15,10 +15,10 @@
 It allows users to edit, enhance, and organize images using AI-based features in a single unified system.
 
 ---
-👤 Author
+## 👤 Author
 
-Piyush Saxena
-🔗 GitHub: https://github.com/Piyushsaxena123
+**Piyush Saxena**  
+**GitHub:** https://github.com/Piyushsaxena123
 
 ---
 
@@ -66,15 +66,15 @@ Piyush Saxena
 ## 📂 Project Structure
 
 
-picperfect-studio/
-├── public/
-├── src/
-│ ├── components/
-│ ├── pages/
-│ ├── utils/
-│ └── services/
-├── package.json
-├── vite.config.js
+picperfect-studio/<br>
+├── public/<br>
+├── src/<br>
+│ ├── components/<br>
+│ ├── pages/<br>
+│ ├── utils/<br>
+│ └── services/<br>
+├── package.json<br>
+├── vite.config.js<br>
 └── README.md
 
 
