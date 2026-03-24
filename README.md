@@ -15,6 +15,12 @@
 It allows users to edit, enhance, and organize images using AI-based features in a single unified system.
 
 ---
+👤 Author
+
+Piyush Saxena
+🔗 GitHub: https://github.com/Piyushsaxena123
+
+---
 
 ## ⚙️ Tech Stack
 
@@ -61,15 +67,15 @@ It allows users to edit, enhance, and organize images using AI-based features in
 
 
 picperfect-studio/
-│── public/
-│── src/
+├── public/
+├── src/
 │ ├── components/
 │ ├── pages/
 │ ├── utils/
 │ └── services/
-│── package.json
-│── vite.config.js
-│── README.md
+├── package.json
+├── vite.config.js
+└── README.md
 
 
 ---
@@ -88,7 +94,7 @@ npm install
 
 # Start development server
 npm run dev
-🔑 Environment Variables
+## 🔑 Environment Variables
 
 Create a .env file and add:
 
@@ -99,11 +105,6 @@ VITE_SUPABASE_URL=your_url
 
 Deployed on Vercel for fast and scalable performance.
 
-👤 Author
-
-Piyush Saxena
-GitHub: https://github.com/Piyushsaxena123
-
 ⭐ Contribution
 
 Feel free to:
@@ -113,29 +114,3 @@ Raise issues
 Submit pull requests
 
 If you like this project, give it a ⭐
-
-
----
-
-# 🔥 What you should do now
-
-1. Open **README.md in VS Code**
-2. **Select all → Delete**
-3. **Paste this**
-4. Save → Push to GitHub
-
----
-
-# 🚀 Result
-
-👉 Your repo will look:
-- Clean  
-- Professional  
-- Placement-ready  
-- Recruiter-friendly  
-
----
-
-If you want next upgrade:
-👉 Add **badges + screenshots + GIF preview (very powerful)**  
-👉 I can make it look like **top GitHub projects** 💯
