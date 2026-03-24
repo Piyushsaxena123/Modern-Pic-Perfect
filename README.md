@@ -1,73 +1,141 @@
-# Welcome to your Lovable project
+# 📸 Modern Pic Perfect – AI Photo Management Platform
 
-## Project info
+---
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Project Info
 
-## How can I edit this code?
+**Live URL:** https://modern-pic-perfect-23.vercel.app/  
+**Repository:** https://github.com/Piyushsaxena123/Modern-Pic-Perfect  
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 📘 Overview
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+**Modern Pic Perfect** is an AI-powered photo editing and management platform designed to simplify image processing tasks.  
+It allows users to edit, enhance, and organize images using AI-based features in a single unified system.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## ⚙️ Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
+- React (Vite)
+- JavaScript
 - Tailwind CSS
+- Supabase (Database, Auth, Storage)
+- AI Edge Functions (Image Processing)
+- Vercel (Deployment)
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 🔥 Features
 
-## Can I connect a custom domain to my Lovable project?
+- AI-powered image editing  
+- Background removal  
+- AI clothing transformation  
+- Image cropping and resizing  
+- Cloud-based storage system  
+- Secure authentication (login/signup)  
+- Clean and responsive UI  
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🛠️ Implementation
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Backend
+- Supabase used for database, authentication, and storage  
+- Stores user data, editing history, and images  
+
+### AI Processing
+- Edge functions for:
+  - Image editing  
+  - Background removal  
+  - Clothing transformation  
+
+### Frontend
+- Built with React + Tailwind CSS  
+- Responsive and user-friendly interface  
+
+---
+
+## 📂 Project Structure
+
+
+picperfect-studio/
+│── public/
+│── src/
+│ ├── components/
+│ ├── pages/
+│ ├── utils/
+│ └── services/
+│── package.json
+│── vite.config.js
+│── README.md
+
+
+---
+
+## 🧪 Run Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/Piyushsaxena123/Modern-Pic-Perfect.git
+
+# Navigate to project folder
+cd picperfect-studio
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+🔑 Environment Variables
+
+Create a .env file and add:
+
+VITE_SUPABASE_PROJECT_ID=your_project_id
+VITE_SUPABASE_PUBLISHABLE_KEY=your_key
+VITE_SUPABASE_URL=your_url
+🚀 Deployment
+
+Deployed on Vercel for fast and scalable performance.
+
+👤 Author
+
+Piyush Saxena
+GitHub: https://github.com/Piyushsaxena123
+
+⭐ Contribution
+
+Feel free to:
+
+Fork this repository
+Raise issues
+Submit pull requests
+
+If you like this project, give it a ⭐
+
+
+---
+
+# 🔥 What you should do now
+
+1. Open **README.md in VS Code**
+2. **Select all → Delete**
+3. **Paste this**
+4. Save → Push to GitHub
+
+---
+
+# 🚀 Result
+
+👉 Your repo will look:
+- Clean  
+- Professional  
+- Placement-ready  
+- Recruiter-friendly  
+
+---
+
+If you want next upgrade:
+👉 Add **badges + screenshots + GIF preview (very powerful)**  
+👉 I can make it look like **top GitHub projects** 💯
